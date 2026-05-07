@@ -36,8 +36,8 @@ slam_toolbox:
     use_scan_barycenter: false
     minimum_travel_distance: 0.25
     minimum_travel_heading: 0.2
-    scan_buffer_size: 500
-    scan_buffer_maximum_scan_distance: 15.0
+    scan_buffer_size: 4000
+    scan_buffer_maximum_scan_distance: 1000.0
     link_match_minimum_response_fine: 0.35  
     link_scan_maximum_distance: 1.5
     loop_search_maximum_distance: 20.0

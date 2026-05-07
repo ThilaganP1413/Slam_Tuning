@@ -21,7 +21,7 @@ def generate_launch_description():
                                    'config', 'mapper_params_online_async.yaml'),
         description='Full path to the ROS2 parameters file to use for the slam_toolbox node')
     
-    bag_path = os.path.expanduser('~/ROS2/slam_ws/src/bag/patrol_lvl3_odom')
+    bag_path = os.path.expanduser('~/ROS2/slam_ws/bag/patrol_lvl3_odom')
     
     bag_play = ExecuteProcess(
         cmd=['ros2', 'bag', 'play',
