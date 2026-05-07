@@ -1,0 +1,67 @@
+slam_toolbox:
+  ros__parameters:
+
+    # Plugin params - CRITICAL CHANGES
+    solver_plugin: solver_plugins::CeresSolver
+    ceres_linear_solver: SPARSE_SCHUR  # ⚠️ CHANGED from SPARSE_NORMAL_CHOLESKY
+    ceres_preconditioner: SCHUR_JACOBI
+    ceres_trust_strategy: LEVENBERG_MARQUARDT
+    ceres_dogleg_type: TRADITIONAL_DOGLEG
+    ceres_loss_function: HuberLoss  # ⚠️ CHANGED from None
+
+    # ROS Parameters
+    odom_frame: odom
+    map_frame: map
+    base_frame: base_link
+    scan_topic: /scan
+    use_map_saver: true
+    mode: mapping
+
+    debug_logging: false
+    throttle_scans: 1
+    transform_publish_period: 0.02 
+    map_update_interval: 10.0  # ⚠️ CHANGED from 1.0
+    resolution: 0.05
+    min_laser_range: 0.0 
+    max_laser_range: 250.0
+    minimum_time_interval: 0.5
+    transform_timeout: 0.2
+    tf_buffer_duration: 180.0
+    stack_size_to_use: 100000000
+    enable_interactive_mode: true
+
+    # General Parameters - OPTIMIZED
+    use_scan_matching: true
+    use_scan_barycenter: true
+    minimum_travel_distance: 0.35  # ⚠️ CHANGED from 0.5
+    minimum_travel_heading: 0.35  # ⚠️ CHANGED from 0.5
+    scan_buffer_size: 100
+    scan_buffer_maximum_scan_distance: 250.0
+    link_match_minimum_response_fine: 0.1  
+    link_scan_maximum_distance: 150.0
+    loop_search_maximum_distance: 3000.0
+    do_loop_closing: true 
+    loop_match_minimum_chain_size: 18           
+    loop_match_maximum_variance_coarse: 2.2  
+    loop_match_minimum_response_coarse: 0.42    
+    loop_match_minimum_response_fine: 0.52
+
+    # Correlation Parameters - OPTIMIZED FOR PRECISION
+    correlation_search_space_dimension: 3.0  # ⚠️ CHANGED from 4.0
+    correlation_search_space_resolution: 0.005  # ⚠️ CHANGED from 0.01
+    correlation_search_space_smear_deviation: 0.05  # ⚠️ CHANGED from 0.06
+
+    # Loop Closure Parameters - EXCELLENT (kept as-is)
+    loop_search_space_dimension: 120.0
+    loop_search_space_resolution: 0.05
+    loop_search_space_smear_deviation: 0.08
+
+    # Scan Matcher Parameters - SLIGHTLY OPTIMIZED
+    distance_variance_penalty: 0.7
+    angle_variance_penalty: 1.2
+    fine_search_angle_offset: 0.00349
+    coarse_search_angle_offset: 0.349
+    coarse_angle_resolution: 0.0349
+    minimum_angle_penalty: 0.95  # ⚠️ CHANGED from 0.9
+    minimum_distance_penalty: 0.6  # ⚠️ CHANGED from 0.5
+    use_response_expansion: true

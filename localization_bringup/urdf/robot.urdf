@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<robot name="slamware_robot">
+  
+  <!-- Odom link (root of the tree) -->
+  <link name="odom"/>
+
+  <!-- Base link -->
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="0.4 0.3 0.1"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <!-- Joint between odom and base_link -->
+  <joint name="odom_to_base" type="fixed">
+    <parent link="odom"/>
+    <child link="base_link"/>
+    <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- lidar link -->
+  <link name="lidar">
+    <visual>
+      <geometry>
+        <cylinder length="0.05" radius="0.05"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <!-- Joint between base_link and lidar -->
+  <!-- Adjust xyz and rpy values based on your robot's actual configuration -->
+  <joint name="base_to_lidar" type="fixed">
+    <parent link="base_link"/>
+    <child link="lidar"/>
+    <!-- xyz: x forward, y left, z up (in meters) -->
+    <!-- rpy: roll pitch yaw (in radians) -->
+    <origin xyz="0.55 0.0 0.2" rpy="0 0 0"/>
+  </joint>
+  
+</robot>
