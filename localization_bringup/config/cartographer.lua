@@ -52,8 +52,8 @@ TRAJECTORY_BUILDER_2D.max_range = 20
 TRAJECTORY_BUILDER_2D.missing_data_ray_length = 5.0
 TRAJECTORY_BUILDER_2D.use_imu_data = false
 TRAJECTORY_BUILDER_2D.use_online_correlative_scan_matching = true
-TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.linear_search_window = 0.15
-TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.angular_search_window = math.rad(30.)
+TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.linear_search_window = 0.05
+TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.angular_search_window = math.rad(10.)
 TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.translation_delta_cost_weight = 30.
 TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.rotation_delta_cost_weight = 1e-1
 
@@ -101,12 +101,12 @@ POSE_GRAPH.constraint_builder.loop_closure_translation_weight = 1e4
 POSE_GRAPH.constraint_builder.loop_closure_rotation_weight = 1e4
 
 POSE_GRAPH.matcher_translation_weight = 70
-POSE_GRAPH.matcher_rotation_weight = 50
+POSE_GRAPH.matcher_rotation_weight = 500
 POSE_GRAPH.max_num_final_iterations = 10000
 
-POSE_GRAPH.optimization_problem.local_slam_pose_translation_weight = 25
-POSE_GRAPH.optimization_problem.local_slam_pose_rotation_weight = 25
-POSE_GRAPH.optimization_problem.odometry_translation_weight = 80
-POSE_GRAPH.optimization_problem.odometry_rotation_weight = 70
+POSE_GRAPH.optimization_problem.local_slam_pose_translation_weight = 10
+POSE_GRAPH.optimization_problem.local_slam_pose_rotation_weight = 10
+POSE_GRAPH.optimization_problem.odometry_translation_weight = 150
+POSE_GRAPH.optimization_problem.odometry_rotation_weight = 100
 
 return options
