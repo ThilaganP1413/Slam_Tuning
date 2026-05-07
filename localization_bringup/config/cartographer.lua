@@ -100,13 +100,13 @@ POSE_GRAPH.constraint_builder.ceres_scan_matcher.rotation_weight = 50
 POSE_GRAPH.constraint_builder.loop_closure_translation_weight = 1e4
 POSE_GRAPH.constraint_builder.loop_closure_rotation_weight = 1e4
 
-POSE_GRAPH.matcher_translation_weight = 100
-POSE_GRAPH.matcher_rotation_weight = 2000
+POSE_GRAPH.matcher_translation_weight = 70
+POSE_GRAPH.matcher_rotation_weight = 50
 POSE_GRAPH.max_num_final_iterations = 10000
 
 POSE_GRAPH.optimization_problem.local_slam_pose_translation_weight = 25
 POSE_GRAPH.optimization_problem.local_slam_pose_rotation_weight = 25
-POSE_GRAPH.optimization_problem.odometry_translation_weight = 60
-POSE_GRAPH.optimization_problem.odometry_rotation_weight = 30
+POSE_GRAPH.optimization_problem.odometry_translation_weight = 80
+POSE_GRAPH.optimization_problem.odometry_rotation_weight = 70
 
 return options
