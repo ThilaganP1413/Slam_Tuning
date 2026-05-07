@@ -1,0 +1,81 @@
+slam_toolbox:
+  ros__parameters:
+
+    # Plugin params - Optimized for 8-core CPU
+    solver_plugin: solver_plugins::CeresSolver
+    ceres_linear_solver: SPARSE_NORMAL_CHOLESKY
+    ceres_preconditioner: SCHUR_JACOBI
+    ceres_trust_strategy: LEVENBERG_MARQUARDT
+    ceres_dogleg_type: TRADITIONAL_DOGLEG
+    ceres_loss_function: HuberLoss
+
+    # ROS Parameters
+    odom_frame: odom
+    map_frame: map
+    base_frame: base_link
+    scan_topic: /scan
+    use_map_saver: true
+    mode: mapping  # MAPPING MODE for building new map
+
+    # Core timing and performance - 100m LiDAR, 1091 points, 15Hz outdoor
+    debug_logging: false
+    throttle_scans: 1  # Process all 15Hz - critical for 100m outdoor mapping
+    transform_publish_period: 0.02
+    map_update_interval: 3.0  # Frequent updates to see map building in real-time
+    resolution: 0.05  # 5cm resolution for detailed outdoor complex
+    max_laser_range: 100.0  # FULL 100m range
+    min_laser_range: 0.5
+    minimum_time_interval: 0.4
+    transform_timeout: 2.0
+    tf_buffer_duration: 90.0
+    stack_size_to_use: 400000000  # Handle large pose graph + map
+    enable_interactive_mode: true
+    
+    # CRITICAL: Rosbag replay mode
+    use_sim_time: true
+    
+    # Message queue management - Full capacity for dense mapping
+    scan_queue_size: 40
+    laser_scan_topic_queue_size: 40
+
+    # General Parameters - 100m outdoor mapping, 1091 points/scan, 170,000m² area
+    use_scan_matching: true
+    use_scan_barycenter: false
+    minimum_travel_distance: 1.5  # ~1200-1500 nodes for 300×360m area
+    minimum_travel_heading: 0.8  # ~46 degrees - capture turns around buildings
+    scan_buffer_size: 25  # 1.7 seconds at 15Hz
+    scan_buffer_maximum_scan_distance: 100.0  # Match full sensor range
+    link_match_minimum_response_fine: 0.30  # Good match quality
+    link_scan_maximum_distance: 6.0  # Can skip larger gaps with 100m vision
+    
+    # Loop Closure Parameters - CRITICAL for drift correction in large outdoor map
+    do_loop_closing: true
+    loop_search_maximum_distance: 18.0  # AGGRESSIVE - 100m can see across complex
+    loop_match_minimum_chain_size: 18  # Moderate confidence - 100m gives strong features
+    loop_match_maximum_variance_coarse: 3.5  # Higher tolerance for 300m+ map
+    loop_match_minimum_response_coarse: 0.35  # Permissive - distant landmarks help
+    loop_match_minimum_response_fine: 0.45  # Achievable with 100m dense scans
+
+    # Correlation Parameters - Dense 1091-point scans, outdoor features
+    correlation_search_space_dimension: 1.5
+    correlation_search_space_resolution: 0.03
+    correlation_search_space_smear_deviation: 0.25
+
+    # Loop closure correlation - Leverage 100m range for wide area matching
+    loop_search_space_dimension: 22.0  # VERY LARGE - 100m sees multiple buildings
+    loop_search_space_resolution: 0.15  # Coarser for efficiency with distant features
+    loop_search_space_smear_deviation: 0.15
+
+    # Scan Matcher Parameters - Optimized for 100m outdoor mapping
+    distance_variance_penalty: 0.25  # LOW - long range = more noise
+    angle_variance_penalty: 0.7  # Moderate-high - building geometry helps
+    fine_search_angle_offset: 0.00349
+    coarse_search_angle_offset: 0.349
+    coarse_angle_resolution: 0.0349
+    minimum_angle_penalty: 0.7
+    minimum_distance_penalty: 0.25  # Relaxed for outdoor long-range
+    use_response_expansion: true
+    
+    # Advanced parameters - Maximize 100m capability for mapping
+    max_laser_range_for_loop_closure: 100.0  # CRITICAL - distant buildings close loops!
+    minimum_range_for_scan_matching: 0.5

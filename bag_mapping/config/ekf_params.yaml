@@ -1,0 +1,39 @@
+ekf_filter_node:
+  ros__parameters:
+    frequency: 50.0
+    sensor_timeout: 0.1
+    two_d_mode: false
+    
+    # Frame configuration
+    world_frame: odom
+    base_link_frame: base_link
+    publish_tf: true
+
+    # --------------------------------------------
+    # Odometry Input 
+    # --------------------------------------------
+    odom0: /odom
+    odom0_config: [true,  true,  false,   # x, y position
+                   false, false, true,    # roll, pitch, yaw - USE YAW
+                   true,  true,  false,   # x_dot, y_dot velocity
+                   false, false, true,    # yaw angular velocity
+                   false, false, false]   # accelerations
+
+    # --------------------------------------------
+    # IMU Input - USE ALL ORIENTATION DATA
+    # --------------------------------------------
+    imu0: /imu
+    imu0_config: [false, false, false,   # NO position
+                  true,  true,  true,    # USE ALL ORIENTATION (roll, pitch, yaw)
+                  false, false, false,   # NO linear velocity  
+                  true,  true,  true,    # USE ALL angular velocity
+                  false, false, false]   # NO linear acceleration
+    imu0_differential: false
+    imu0_relative: false
+    imu0_remove_gravitational_acceleration: true
+
+    # Enable bias estimation for IMU
+    imu0_bias: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+    # Process noise - allow the EKF to learn the offsets
+    dynamic_process_noise_covariance: true
