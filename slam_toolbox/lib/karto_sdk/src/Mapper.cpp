@@ -1505,6 +1505,13 @@ kt_bool MapperGraph::TryCloseLoop(LocalizedRangeScan * pScan, const Name & rSens
 
   LocalizedRangeScanVector candidateChain = FindPossibleLoopClosure(pScan, rSensorName, scanIndex);
 
+    // ── LoopClosure DEBUG ────────────────────────────────────────────────────────
+    std::cout << "[TryCloseLoop] ScanID=" << pScan->GetStateId()
+          << " | candidateChain size=" << candidateChain.size()
+          << (candidateChain.empty() ? " → SKIPPING" : " → ATTEMPTING match")
+          << std::endl;
+    // ─────────────────────────────────────────────────────────────────
+
   while (!candidateChain.empty()) {
     Pose2 bestPose;
     Matrix3 covariance;
@@ -1519,6 +1526,15 @@ kt_bool MapperGraph::TryCloseLoop(LocalizedRangeScan * pScan, const Name & rSens
       " (< " << m_pMapper->m_pLoopMatchMaximumVarianceCoarse->GetValue() << ")";
 
     m_pMapper->FireLoopClosureCheck(stream.str());
+
+    // ── LoopClosure DEBUG ────────────────────────────────────────────────────────
+    std::cout << "[TryCloseLoop] ScanID=" << pScan->GetStateId()
+              << " | COARSE response=" << coarseResponse
+              << " (need >" << m_pMapper->m_pLoopMatchMinimumResponseCoarse->GetValue() << ")"
+              << " var=(" << covariance(0,0) << "," << covariance(1,1) << ")"
+              << " (need <" << m_pMapper->m_pLoopMatchMaximumVarianceCoarse->GetValue() << ")"
+              << std::endl;
+    // ─────────────────────────────────────────────────────────────────
 
     if ((coarseResponse > m_pMapper->m_pLoopMatchMinimumResponseCoarse->GetValue()) &&
       (covariance(0, 0) < m_pMapper->m_pLoopMatchMaximumVarianceCoarse->GetValue()) &&
@@ -1539,8 +1555,19 @@ kt_bool MapperGraph::TryCloseLoop(LocalizedRangeScan * pScan, const Name & rSens
         m_pMapper->m_pLoopMatchMinimumResponseFine->GetValue() << ")" << std::endl;
       m_pMapper->FireLoopClosureCheck(stream1.str());
 
+      // ── LoopClosure DEBUG ────────────────────────────────────────────────────────
+      std::cout << "[TryCloseLoop] ScanID=" << pScan->GetStateId()
+                << " | FINE response=" << fineResponse
+                << " (need >" << m_pMapper->m_pLoopMatchMinimumResponseFine->GetValue() << ")"
+                << std::endl;
+      // ─────────────────────────────────────────────────────────────
+
       if (fineResponse < m_pMapper->m_pLoopMatchMinimumResponseFine->GetValue()) {
         m_pMapper->FireLoopClosureCheck("REJECTED!");
+        // ── LoopClosure DEBUG ────────────────────────────────────────────────────────
+        std::cout << "[TryCloseLoop] ScanID=" << pScan->GetStateId()
+                  << " | REJECTED at fine stage" << std::endl;
+        // ─────────────────────────────────────────────────────────────────
       } else {
         m_pMapper->FireBeginLoopClosure("Closing loop...");
 
@@ -1551,10 +1578,28 @@ kt_bool MapperGraph::TryCloseLoop(LocalizedRangeScan * pScan, const Name & rSens
         m_pMapper->FireEndLoopClosure("Loop closed!");
 
         loopClosed = true;
+
+        // ── LoopClosure DEBUG ────────────────────────────────────────────────────────
+        std::cout << "[TryCloseLoop] ScanID=" << pScan->GetStateId()
+                  << " | ✓ LOOP CLOSED!" << std::endl;
+        // ─────────────────────────────────────────────────────────────────
       }
+    } else {
+      m_pMapper->FireLoopClosureCheck("REJECTED!");
+
+      // ── LoopClosure DEBUG ────────────────────────────────────────────────────────
+      std::cout << "[TryCloseLoop] ScanID=" << pScan->GetStateId()
+                << " | REJECTED at coarse stage" << std::endl;
+      // ─────────────────────────────────────────────────────────────────
     }
 
     candidateChain = FindPossibleLoopClosure(pScan, rSensorName, scanIndex);
+
+    // ── LoopClosure DEBUG ────────────────────────────────────────────────────────
+    std::cout << "[TryCloseLoop] Next candidateChain size=" << candidateChain.size()
+          << std::endl;
+    // ─────────────────────────────────────────────────────────────────
+
   }
 
   return loopClosed;
@@ -1971,6 +2016,13 @@ LocalizedRangeScanVector MapperGraph::FindPossibleLoopClosure(
   const LocalizedRangeScanVector nearLinkedScans =
     FindNearLinkedScans(pScan, m_pMapper->m_pLoopSearchMaximumDistance->GetValue());
 
+  // ── LoopClosure DEBUG ──────────────────────────────────────────────────────
+  std::cout << "[LoopClosure] ScanID=" << pScan->GetStateId()
+            << " | nearLinkedScans (excluded)=" << nearLinkedScans.size()
+            << " | searchDist=" << m_pMapper->m_pLoopSearchMaximumDistance->GetValue()
+            << std::endl;
+  // ─────────────────────────────────────────────────────────────────
+
   kt_int32u nScans =
     static_cast<kt_int32u>(m_pMapper->m_pMapperSensorManager->GetScans(rSensorName).size());
   for (; rStartNum < nScans; rStartNum++) {
@@ -1985,20 +2037,36 @@ LocalizedRangeScanVector MapperGraph::FindPossibleLoopClosure(
       m_pMapper->m_pUseScanBarycenter->GetValue());
 
     kt_double squaredDistance = candidateScanPose.GetPosition().SquaredDistance(pose.GetPosition());
+    
     if (squaredDistance <
       math::Square(m_pMapper->m_pLoopSearchMaximumDistance->GetValue()) + KT_TOLERANCE)
-    {
-      // a linked scan cannot be in the chain
-      if (find(nearLinkedScans.begin(), nearLinkedScans.end(),
-        pCandidateScan) != nearLinkedScans.end())
       {
-        chain.clear();
-      } else {
-        chain.push_back(pCandidateScan);
+        // a linked scan cannot be in the chain
+        if (find(nearLinkedScans.begin(), nearLinkedScans.end(),
+        pCandidateScan) != nearLinkedScans.end())
+        {
+          chain.clear();
+        } else {
+          chain.push_back(pCandidateScan);
+      
+          // ── LoopClosure DEBUG ──────────────────────────────────────────────
+          kt_double actualDist = std::sqrt(squaredDistance);
+          if (actualDist < m_pMapper->m_pLoopSearchMaximumDistance->GetValue()) {
+              std::cout << "[LoopClosure]   scan=" << pCandidateScan->GetStateId()
+                        << " dist=" << std::fixed << std::setprecision(2) << actualDist
+                        << " IN_RANGE chainNow=" << chain.size()
+                        << std::endl;
+          }
+          // ─────────────────────────────────────────────────────────────────
       }
     } else {
       // return chain if it is long "enough"
       if (chain.size() >= m_pMapper->m_pLoopMatchMinimumChainSize->GetValue()) {
+        // ── LoopClosure DEBUG ──────────────────────────────────────────────
+        std::cout << "[LoopClosure]   chain ACCEPTED: size=" << chain.size()
+                  << " (min=" << m_pMapper->m_pLoopMatchMinimumChainSize->GetValue()
+                  << ")" << std::endl;
+        // ─────────────────────────────────────────────────────────────────
         return chain;
       } else {
         chain.clear();
