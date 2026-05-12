@@ -156,7 +156,7 @@ void LoopClosureAssistant::publishGraph()
     return;
   }
 
-  RCLCPP_DEBUG(node_->get_logger(), "Graph size: %zu", graph->size());
+  // RCLCPP_DEBUG(node_->get_logger(), "Graph size: %zu", graph->size());
   bool interactive_mode = false;
   {
     boost::mutex::scoped_lock lock(interactive_mutex_);
