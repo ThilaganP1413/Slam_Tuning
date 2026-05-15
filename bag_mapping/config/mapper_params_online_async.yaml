@@ -64,7 +64,7 @@ slam_toolbox:
     fine_search_angle_offset: 0.0025    
     coarse_search_angle_offset: 0.25   
     coarse_angle_resolution: 0.025        
-    minimum_angle_penalty: 0.7
+    minimum_angle_penalty: 0.3
     minimum_distance_penalty: 0.3
     use_response_expansion: false
     min_pass_through: 2
