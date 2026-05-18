@@ -81,14 +81,14 @@ TRAJECTORY_BUILDER_2D.adaptive_voxel_filter.min_num_points = 50
 --new end
 
 POSE_GRAPH.optimization_problem.huber_scale = 2e2
-POSE_GRAPH.optimize_every_n_nodes = 50
+POSE_GRAPH.optimize_every_n_nodes = 35
 POSE_GRAPH.constraint_builder.min_score = 0.62
 
-POSE_GRAPH.constraint_builder.sampling_ratio = 0.3
+POSE_GRAPH.constraint_builder.sampling_ratio = 0.8
 POSE_GRAPH.constraint_builder.log_matches = false
 
 POSE_GRAPH.global_constraint_search_after_n_seconds = 30
-POSE_GRAPH.constraint_builder.max_constraint_distance = 30
+POSE_GRAPH.constraint_builder.max_constraint_distance = 20
 
 POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher.branch_and_bound_depth = 6
 
@@ -98,7 +98,7 @@ POSE_GRAPH.constraint_builder.ceres_scan_matcher.rotation_weight = 50
 --new
 
 POSE_GRAPH.constraint_builder.loop_closure_translation_weight = 3e3
-POSE_GRAPH.constraint_builder.loop_closure_rotation_weight = 7e3
+POSE_GRAPH.constraint_builder.loop_closure_rotation_weight = 5e3
 
 POSE_GRAPH.matcher_translation_weight = 120
 POSE_GRAPH.matcher_rotation_weight = 800
