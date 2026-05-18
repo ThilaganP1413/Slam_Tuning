@@ -46,7 +46,7 @@ MAP_BUILDER.use_trajectory_builder_2d = true
 MAP_BUILDER.num_background_threads = 16
 TRAJECTORY_BUILDER_2D.num_accumulated_range_data = 1 -- no of lidar
 
-TRAJECTORY_BUILDER_2D.submaps.num_range_data = 70
+TRAJECTORY_BUILDER_2D.submaps.num_range_data = 90
 TRAJECTORY_BUILDER_2D.min_range = 0.05
 TRAJECTORY_BUILDER_2D.max_range = 20
 TRAJECTORY_BUILDER_2D.missing_data_ray_length = 5.0
@@ -58,7 +58,7 @@ TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.translation_delta_cost_
 TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.rotation_delta_cost_weight = 1e-1
 
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.translation_weight = 30
-TRAJECTORY_BUILDER_2D.ceres_scan_matcher.rotation_weight = 30
+TRAJECTORY_BUILDER_2D.ceres_scan_matcher.rotation_weight = 80
 
 --new start
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.ceres_solver_options.use_nonmonotonic_steps = true
@@ -81,8 +81,8 @@ TRAJECTORY_BUILDER_2D.adaptive_voxel_filter.min_num_points = 50
 --new end
 
 POSE_GRAPH.optimization_problem.huber_scale = 2e2
-POSE_GRAPH.optimize_every_n_nodes = 60
-POSE_GRAPH.constraint_builder.min_score = 0.65
+POSE_GRAPH.optimize_every_n_nodes = 80
+POSE_GRAPH.constraint_builder.min_score = 0.70
 
 POSE_GRAPH.constraint_builder.sampling_ratio = 0.3
 POSE_GRAPH.constraint_builder.log_matches = false
@@ -98,15 +98,15 @@ POSE_GRAPH.constraint_builder.ceres_scan_matcher.rotation_weight = 50
 --new
 
 POSE_GRAPH.constraint_builder.loop_closure_translation_weight = 3e3
-POSE_GRAPH.constraint_builder.loop_closure_rotation_weight = 3e3
+POSE_GRAPH.constraint_builder.loop_closure_rotation_weight = 7e3
 
 POSE_GRAPH.matcher_translation_weight = 120
-POSE_GRAPH.matcher_rotation_weight = 800
+POSE_GRAPH.matcher_rotation_weight = 1500
 POSE_GRAPH.max_num_final_iterations = 2000
 
 POSE_GRAPH.optimization_problem.local_slam_pose_translation_weight = 30
 POSE_GRAPH.optimization_problem.local_slam_pose_rotation_weight = 30
 POSE_GRAPH.optimization_problem.odometry_translation_weight = 300
-POSE_GRAPH.optimization_problem.odometry_rotation_weight = 300
+POSE_GRAPH.optimization_problem.odometry_rotation_weight = 700
 
 return options
