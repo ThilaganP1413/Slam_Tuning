@@ -58,7 +58,7 @@ TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.translation_delta_cost_
 TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.rotation_delta_cost_weight = 1e-1
 
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.translation_weight = 30
-TRAJECTORY_BUILDER_2D.ceres_scan_matcher.rotation_weight = 60
+TRAJECTORY_BUILDER_2D.ceres_scan_matcher.rotation_weight = 80
 
 --new start
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.ceres_solver_options.use_nonmonotonic_steps = true
