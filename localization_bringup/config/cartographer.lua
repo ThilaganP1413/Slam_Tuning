@@ -58,7 +58,7 @@ TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.translation_delta_cost_
 TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.rotation_delta_cost_weight = 1e-1
 
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.translation_weight = 30
-TRAJECTORY_BUILDER_2D.ceres_scan_matcher.rotation_weight = 100
+TRAJECTORY_BUILDER_2D.ceres_scan_matcher.rotation_weight = 120
 
 --new start
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.ceres_solver_options.use_nonmonotonic_steps = true
@@ -105,7 +105,7 @@ POSE_GRAPH.matcher_rotation_weight = 800
 POSE_GRAPH.max_num_final_iterations = 2000
 
 POSE_GRAPH.optimization_problem.local_slam_pose_translation_weight = 30
-POSE_GRAPH.optimization_problem.local_slam_pose_rotation_weight = 30
+POSE_GRAPH.optimization_problem.local_slam_pose_rotation_weight = 20
 POSE_GRAPH.optimization_problem.odometry_translation_weight = 300
 POSE_GRAPH.optimization_problem.odometry_rotation_weight = 300
 
