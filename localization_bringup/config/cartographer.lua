@@ -83,15 +83,15 @@ TRAJECTORY_BUILDER_2D.motion_filter.max_angle_radians = math.rad(1.)
 -- TRAJECTORY_BUILDER_2D.pose_extrapolator.imu_based.solver_options.max_num_iterations = 10
 -- TRAJECTORY_BUILDER_2D.pose_extrapolator.imu_based.solver_options.num_threads = 1
 
-TRAJECTORY_BUILDER_2D.submaps.num_range_data = 90
+TRAJECTORY_BUILDER_2D.submaps.num_range_data = 60
 TRAJECTORY_BUILDER_2D.submaps.grid_options_2d.grid_type = "PROBABILITY_GRID"
 TRAJECTORY_BUILDER_2D.submaps.grid_options_2d.resolution = 0.05
 
 TRAJECTORY_BUILDER_2D.submaps.range_data_inserter.range_data_inserter_type = "PROBABILITY_GRID_INSERTER_2D"
 
 TRAJECTORY_BUILDER_2D.submaps.range_data_inserter.probability_grid_range_data_inserter.insert_free_space = true
-TRAJECTORY_BUILDER_2D.submaps.range_data_inserter.probability_grid_range_data_inserter.hit_probability = 0.55
-TRAJECTORY_BUILDER_2D.submaps.range_data_inserter.probability_grid_range_data_inserter.miss_probability = 0.49
+TRAJECTORY_BUILDER_2D.submaps.range_data_inserter.probability_grid_range_data_inserter.hit_probability = 0.65
+TRAJECTORY_BUILDER_2D.submaps.range_data_inserter.probability_grid_range_data_inserter.miss_probability = 0.45
 
 POSE_GRAPH.optimize_every_n_nodes = 90
 
@@ -107,14 +107,14 @@ POSE_GRAPH.constraint_builder.log_matches = false
 
 POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher.linear_search_window = 7.
 POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher.angular_search_window = math.rad(30.)
-POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher.branch_and_bound_depth = 7
+POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher.branch_and_bound_depth = 9
 
 POSE_GRAPH.constraint_builder.ceres_scan_matcher.occupied_space_weight = 20.
 POSE_GRAPH.constraint_builder.ceres_scan_matcher.translation_weight = 10.
 POSE_GRAPH.constraint_builder.ceres_scan_matcher.rotation_weight = 1.
 
 POSE_GRAPH.constraint_builder.ceres_scan_matcher.ceres_solver_options.use_nonmonotonic_steps = true
-POSE_GRAPH.constraint_builder.ceres_scan_matcher.ceres_solver_options.max_num_iterations = 10
+POSE_GRAPH.constraint_builder.ceres_scan_matcher.ceres_solver_options.max_num_iterations = 15
 POSE_GRAPH.constraint_builder.ceres_scan_matcher.ceres_solver_options.num_threads = 1
 
 POSE_GRAPH.matcher_translation_weight = 5e2
