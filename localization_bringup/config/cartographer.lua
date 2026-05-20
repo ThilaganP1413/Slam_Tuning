@@ -29,7 +29,7 @@ options = {
 }
 
 MAP_BUILDER.use_trajectory_builder_2d = true
-MAP_BUILDER.num_background_threads = 16
+MAP_BUILDER.num_background_threads = 8
 TRAJECTORY_BUILDER_2D.num_accumulated_range_data = 1 -- no of parts a full 360 degree scan is divided into
 
 TRAJECTORY_BUILDER_2D.min_range = 0.5
@@ -53,8 +53,8 @@ TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.translation_delta_cost_
 TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.rotation_delta_cost_weight = 1e-1
 
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.occupied_space_weight = 10
-TRAJECTORY_BUILDER_2D.ceres_scan_matcher.translation_weight = 500
-TRAJECTORY_BUILDER_2D.ceres_scan_matcher.rotation_weight = 500
+TRAJECTORY_BUILDER_2D.ceres_scan_matcher.translation_weight = 150
+TRAJECTORY_BUILDER_2D.ceres_scan_matcher.rotation_weight = 150
 
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.ceres_solver_options.use_nonmonotonic_steps = false
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.ceres_solver_options.max_num_iterations = 15
@@ -83,21 +83,21 @@ POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher.branch_and_bound_dep
 POSE_GRAPH.optimization_problem.huber_scale = 50
 POSE_GRAPH.constraint_builder.min_score = 0.35
 
-POSE_GRAPH.global_constraint_search_after_n_seconds = 60
+POSE_GRAPH.global_constraint_search_after_n_seconds = 30
 
 POSE_GRAPH.constraint_builder.ceres_scan_matcher.translation_weight = 120
 POSE_GRAPH.constraint_builder.ceres_scan_matcher.rotation_weight = 90
 
-POSE_GRAPH.constraint_builder.loop_closure_translation_weight = 1000
-POSE_GRAPH.constraint_builder.loop_closure_rotation_weight = 1000
+POSE_GRAPH.constraint_builder.loop_closure_translation_weight = 100
+POSE_GRAPH.constraint_builder.loop_closure_rotation_weight = 100
 
-POSE_GRAPH.matcher_translation_weight = 60
+POSE_GRAPH.matcher_translation_weight = 80
 POSE_GRAPH.matcher_rotation_weight = 80
 POSE_GRAPH.max_num_final_iterations = 1000
 
-POSE_GRAPH.optimization_problem.local_slam_pose_translation_weight = 150
+POSE_GRAPH.optimization_problem.local_slam_pose_translation_weight = 100
 POSE_GRAPH.optimization_problem.local_slam_pose_rotation_weight = 100
-POSE_GRAPH.optimization_problem.odometry_translation_weight = 400
-POSE_GRAPH.optimization_problem.odometry_rotation_weight = 450
+POSE_GRAPH.optimization_problem.odometry_translation_weight = 150
+POSE_GRAPH.optimization_problem.odometry_rotation_weight = 150
 
 return options
