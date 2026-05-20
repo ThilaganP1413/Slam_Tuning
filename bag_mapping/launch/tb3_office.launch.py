@@ -36,7 +36,7 @@ def generate_launch_description():
     y_pose = LaunchConfiguration('y_pose', default='5.0')
     z_pose = LaunchConfiguration('z_pose', default='0.1')
     frame_prefix = LaunchConfiguration('frame_prefix', default='')
-    world = '/home/ubuntu-tp/ROS2/Gazebo_Worlds/gazebo_models_worlds_collection/worlds/office_env_large.world'
+    world = '/home/thilaks/ROS2/Gazebo_Worlds/gazebo_models_worlds_collection/worlds/office_env_large.world'
 
     urdf_file_name = 'turtlebot3_' + TURTLEBOT3_MODEL + '.urdf'
     urdf_path = os.path.join(
