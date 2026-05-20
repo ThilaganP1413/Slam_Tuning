@@ -54,7 +54,7 @@ TRAJECTORY_BUILDER_2D.num_accumulated_range_data = 1
 -- TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.translation_delta_cost_weight = 1e-1
 -- TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.rotation_delta_cost_weight = 1e-1
 
-TRAJECTORY_BUILDER_2D.ceres_scan_matcher.occupied_space_weight = 10.
+TRAJECTORY_BUILDER_2D.ceres_scan_matcher.occupied_space_weight = 1.
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.translation_weight = 10.
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.rotation_weight = 60.
 
@@ -62,7 +62,7 @@ TRAJECTORY_BUILDER_2D.ceres_scan_matcher.ceres_solver_options.use_nonmonotonic_s
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.ceres_solver_options.max_num_iterations = 20
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.ceres_solver_options.num_threads = 1
 
-TRAJECTORY_BUILDER_2D.motion_filter.max_time_seconds = 0.5
+TRAJECTORY_BUILDER_2D.motion_filter.max_time_seconds = 5.0
 TRAJECTORY_BUILDER_2D.motion_filter.max_distance_meters = 0.2
 TRAJECTORY_BUILDER_2D.motion_filter.max_angle_radians = math.rad(1.)
 
