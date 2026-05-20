@@ -34,25 +34,25 @@ MAP_BUILDER.num_background_threads = 8
 TRAJECTORY_BUILDER_2D.use_imu_data = false
 TRAJECTORY_BUILDER_2D.min_range = 0.
 TRAJECTORY_BUILDER_2D.max_range = 30.0
-TRAJECTORY_BUILDER_2D.min_z = -0.8
-TRAJECTORY_BUILDER_2D.max_z = 2.
+-- TRAJECTORY_BUILDER_2D.min_z = -0.8
+-- TRAJECTORY_BUILDER_2D.max_z = 2.
 TRAJECTORY_BUILDER_2D.missing_data_ray_length = 5.
 TRAJECTORY_BUILDER_2D.num_accumulated_range_data = 1
-TRAJECTORY_BUILDER_2D.voxel_filter_size = 0.025
+-- TRAJECTORY_BUILDER_2D.voxel_filter_size = 0.025
 
-TRAJECTORY_BUILDER_2D.adaptive_voxel_filter.max_length = 0.5
-TRAJECTORY_BUILDER_2D.adaptive_voxel_filter.min_num_points = 200
-TRAJECTORY_BUILDER_2D.adaptive_voxel_filter.max_range = 50.
+-- TRAJECTORY_BUILDER_2D.adaptive_voxel_filter.max_length = 0.5
+-- TRAJECTORY_BUILDER_2D.adaptive_voxel_filter.min_num_points = 200
+-- TRAJECTORY_BUILDER_2D.adaptive_voxel_filter.max_range = 50.
 
-TRAJECTORY_BUILDER_2D.loop_closure_adaptive_voxel_filter.max_length = 0.9
-TRAJECTORY_BUILDER_2D.loop_closure_adaptive_voxel_filter.min_num_points = 100
-TRAJECTORY_BUILDER_2D.loop_closure_adaptive_voxel_filter.max_range = 50.
+-- TRAJECTORY_BUILDER_2D.loop_closure_adaptive_voxel_filter.max_length = 0.9
+-- TRAJECTORY_BUILDER_2D.loop_closure_adaptive_voxel_filter.min_num_points = 100
+-- TRAJECTORY_BUILDER_2D.loop_closure_adaptive_voxel_filter.max_range = 50.
 
-TRAJECTORY_BUILDER_2D.use_online_correlative_scan_matching = false
-TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.linear_search_window = 0.1
-TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.angular_search_window = math.rad(20.)
-TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.translation_delta_cost_weight = 1e-1
-TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.rotation_delta_cost_weight = 1e-1
+-- TRAJECTORY_BUILDER_2D.use_online_correlative_scan_matching = false
+-- TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.linear_search_window = 0.1
+-- TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.angular_search_window = math.rad(20.)
+-- TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.translation_delta_cost_weight = 1e-1
+-- TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.rotation_delta_cost_weight = 1e-1
 
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.occupied_space_weight = 1.
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.translation_weight = 10.
@@ -67,21 +67,21 @@ TRAJECTORY_BUILDER_2D.motion_filter.max_distance_meters = 0.2
 TRAJECTORY_BUILDER_2D.motion_filter.max_angle_radians = math.rad(1.)
 
 -- TRAJECTORY_BUILDER_2D.pose_extrapolator.use_imu_data = false
-TRAJECTORY_BUILDER_2D.pose_extrapolator.constant_velocity.imu_gravity_time_constant = 10.
-TRAJECTORY_BUILDER_2D.pose_extrapolator.constant_velocity.pose_queue_duration = 0.001
+-- TRAJECTORY_BUILDER_2D.pose_extrapolator.constant_velocity.imu_gravity_time_constant = 10.
+-- TRAJECTORY_BUILDER_2D.pose_extrapolator.constant_velocity.pose_queue_duration = 0.001
 
-TRAJECTORY_BUILDER_2D.pose_extrapolator.imu_based.pose_queue_duration = 5.
-TRAJECTORY_BUILDER_2D.pose_extrapolator.imu_based.gravity_constant = 9.806
-TRAJECTORY_BUILDER_2D.pose_extrapolator.imu_based.pose_translation_weight = 1.
-TRAJECTORY_BUILDER_2D.pose_extrapolator.imu_based.pose_rotation_weight = 1.
-TRAJECTORY_BUILDER_2D.pose_extrapolator.imu_based.imu_acceleration_weight = 1.
-TRAJECTORY_BUILDER_2D.pose_extrapolator.imu_based.imu_rotation_weight = 1.
-TRAJECTORY_BUILDER_2D.pose_extrapolator.imu_based.odometry_translation_weight = 1.
-TRAJECTORY_BUILDER_2D.pose_extrapolator.imu_based.odometry_rotation_weight = 1.
+-- TRAJECTORY_BUILDER_2D.pose_extrapolator.imu_based.pose_queue_duration = 5.
+-- TRAJECTORY_BUILDER_2D.pose_extrapolator.imu_based.gravity_constant = 9.806
+-- TRAJECTORY_BUILDER_2D.pose_extrapolator.imu_based.pose_translation_weight = 1.
+-- TRAJECTORY_BUILDER_2D.pose_extrapolator.imu_based.pose_rotation_weight = 1.
+-- TRAJECTORY_BUILDER_2D.pose_extrapolator.imu_based.imu_acceleration_weight = 1.
+-- TRAJECTORY_BUILDER_2D.pose_extrapolator.imu_based.imu_rotation_weight = 1.
+-- TRAJECTORY_BUILDER_2D.pose_extrapolator.imu_based.odometry_translation_weight = 1.
+-- TRAJECTORY_BUILDER_2D.pose_extrapolator.imu_based.odometry_rotation_weight = 1.
 
-TRAJECTORY_BUILDER_2D.pose_extrapolator.imu_based.solver_options.use_nonmonotonic_steps = false
-TRAJECTORY_BUILDER_2D.pose_extrapolator.imu_based.solver_options.max_num_iterations = 10
-TRAJECTORY_BUILDER_2D.pose_extrapolator.imu_based.solver_options.num_threads = 1
+-- TRAJECTORY_BUILDER_2D.pose_extrapolator.imu_based.solver_options.use_nonmonotonic_steps = false
+-- TRAJECTORY_BUILDER_2D.pose_extrapolator.imu_based.solver_options.max_num_iterations = 10
+-- TRAJECTORY_BUILDER_2D.pose_extrapolator.imu_based.solver_options.num_threads = 1
 
 TRAJECTORY_BUILDER_2D.submaps.num_range_data = 90
 TRAJECTORY_BUILDER_2D.submaps.grid_options_2d.grid_type = "PROBABILITY_GRID"
