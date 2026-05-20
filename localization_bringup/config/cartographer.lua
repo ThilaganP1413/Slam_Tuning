@@ -95,10 +95,10 @@ TRAJECTORY_BUILDER_2D.submaps.range_data_inserter.probability_grid_range_data_in
 
 POSE_GRAPH.optimize_every_n_nodes = 90
 
-POSE_GRAPH.constraint_builder.sampling_ratio = 0.3
+POSE_GRAPH.constraint_builder.sampling_ratio = 0.5
 POSE_GRAPH.constraint_builder.max_constraint_distance = 15.
-POSE_GRAPH.constraint_builder.min_score = 0.55
-POSE_GRAPH.constraint_builder.global_localization_min_score = 0.6
+POSE_GRAPH.constraint_builder.min_score = 0.60
+POSE_GRAPH.constraint_builder.global_localization_min_score = 0.65
 
 POSE_GRAPH.constraint_builder.loop_closure_translation_weight = 1.1e4
 POSE_GRAPH.constraint_builder.loop_closure_rotation_weight = 1e5
