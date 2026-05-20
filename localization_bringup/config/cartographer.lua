@@ -33,7 +33,7 @@ MAP_BUILDER.num_background_threads = 8
 
 TRAJECTORY_BUILDER_2D.use_imu_data = false
 TRAJECTORY_BUILDER_2D.min_range = 0.
-TRAJECTORY_BUILDER_2D.max_range = 30.0
+TRAJECTORY_BUILDER_2D.max_range = 17.0
 -- TRAJECTORY_BUILDER_2D.min_z = -0.8
 -- TRAJECTORY_BUILDER_2D.max_z = 2.
 TRAJECTORY_BUILDER_2D.missing_data_ray_length = 5.
@@ -126,8 +126,8 @@ POSE_GRAPH.optimization_problem.rotation_weight = 1.6e4
 POSE_GRAPH.optimization_problem.local_slam_pose_translation_weight = 1e5
 POSE_GRAPH.optimization_problem.local_slam_pose_rotation_weight = 1e5
 
-POSE_GRAPH.optimization_problem.odometry_translation_weight = 1e5
-POSE_GRAPH.optimization_problem.odometry_rotation_weight = 1e5
+POSE_GRAPH.optimization_problem.odometry_translation_weight = 2e5
+POSE_GRAPH.optimization_problem.odometry_rotation_weight = 2e5
 
 POSE_GRAPH.optimization_problem.fixed_frame_pose_translation_weight = 1e1
 POSE_GRAPH.optimization_problem.fixed_frame_pose_rotation_weight = 1e2
