@@ -62,9 +62,9 @@ TRAJECTORY_BUILDER_2D.ceres_scan_matcher.ceres_solver_options.use_nonmonotonic_s
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.ceres_solver_options.max_num_iterations = 20
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.ceres_solver_options.num_threads = 1
 
-TRAJECTORY_BUILDER_2D.motion_filter.max_time_seconds = 2.0
-TRAJECTORY_BUILDER_2D.motion_filter.max_distance_meters = 0.2
-TRAJECTORY_BUILDER_2D.motion_filter.max_angle_radians = math.rad(1.)
+TRAJECTORY_BUILDER_2D.motion_filter.max_time_seconds = 1.0
+TRAJECTORY_BUILDER_2D.motion_filter.max_distance_meters = 0.3
+TRAJECTORY_BUILDER_2D.motion_filter.max_angle_radians = math.rad(10.)
 
 -- TRAJECTORY_BUILDER_2D.pose_extrapolator.use_imu_data = false
 -- TRAJECTORY_BUILDER_2D.pose_extrapolator.constant_velocity.imu_gravity_time_constant = 10.
@@ -90,10 +90,10 @@ TRAJECTORY_BUILDER_2D.submaps.grid_options_2d.resolution = 0.05
 TRAJECTORY_BUILDER_2D.submaps.range_data_inserter.range_data_inserter_type = "PROBABILITY_GRID_INSERTER_2D"
 
 TRAJECTORY_BUILDER_2D.submaps.range_data_inserter.probability_grid_range_data_inserter.insert_free_space = true
-TRAJECTORY_BUILDER_2D.submaps.range_data_inserter.probability_grid_range_data_inserter.hit_probability = 0.65
+TRAJECTORY_BUILDER_2D.submaps.range_data_inserter.probability_grid_range_data_inserter.hit_probability = 0.6
 TRAJECTORY_BUILDER_2D.submaps.range_data_inserter.probability_grid_range_data_inserter.miss_probability = 0.45
 
-POSE_GRAPH.optimize_every_n_nodes = 90
+POSE_GRAPH.optimize_every_n_nodes = 45
 
 POSE_GRAPH.constraint_builder.sampling_ratio = 0.5
 POSE_GRAPH.constraint_builder.max_constraint_distance = 15.
