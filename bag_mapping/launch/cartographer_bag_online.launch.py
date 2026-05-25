@@ -5,7 +5,7 @@ import os
 def generate_launch_description():
     # Update these paths to match your actual directory structure
     urdf_path = os.path.expanduser('~/ROS2/slam_ws/src/bag_mapping/urdf/ipr_robot.urdf')
-    config_path = os.path.expanduser('~/ROS2/slam_ws/src/bag_mapping/config/cartographer.lua')
+    config_path = os.path.expanduser('~/ROS2/slam_ws/src/localization_bringup/config/cartographer.lua')
 
     return LaunchDescription([
         # Node(
