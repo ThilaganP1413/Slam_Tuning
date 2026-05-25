@@ -30,7 +30,7 @@ def generate_launch_description():
             arguments=['-configuration_directory', os.path.dirname(config_path),
                        '-configuration_basename', 'cartographer.lua'],
             # This is the line that fixes your topic issue:
-            remappings=[('/scan', '/laser_scan')] 
+            # remappings=[('/scan', '/laser_scan')] 
         ),
         
         # Occupancy Grid Node

@@ -12,7 +12,7 @@ def generate_launch_description():
     
     # Path to configuration file
     configuration_basename = LaunchConfiguration('configuration_basename', 
-                                                  default='cartographer_nyp.lua')
+                                                  default='cartographer.lua')
     config_dir = LaunchConfiguration('config_dir', 
                                      default=os.path.join(pkg_share, 'config'))
     
