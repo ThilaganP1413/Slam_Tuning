@@ -93,7 +93,7 @@ TRAJECTORY_BUILDER_2D.submaps.range_data_inserter.probability_grid_range_data_in
 TRAJECTORY_BUILDER_2D.submaps.range_data_inserter.probability_grid_range_data_inserter.hit_probability = 0.7
 TRAJECTORY_BUILDER_2D.submaps.range_data_inserter.probability_grid_range_data_inserter.miss_probability = 0.45
 
-POSE_GRAPH.optimize_every_n_nodes = 0
+POSE_GRAPH.optimize_every_n_nodes = 30
 
 POSE_GRAPH.constraint_builder.sampling_ratio = 0.3
 POSE_GRAPH.constraint_builder.max_constraint_distance = 15.
@@ -144,7 +144,7 @@ POSE_GRAPH.optimization_problem.ceres_solver_options.num_threads = 7
 POSE_GRAPH.max_num_final_iterations = 200
 POSE_GRAPH.global_sampling_ratio = 0.003
 POSE_GRAPH.log_residual_histograms = false
-POSE_GRAPH.global_constraint_search_after_n_seconds = 0.
+POSE_GRAPH.global_constraint_search_after_n_seconds = 120.
 
 
 return options
