@@ -2852,12 +2852,27 @@ kt_bool Mapper::Process(LocalizedRangeScan * pScan, Matrix3 * covariance)
     // correct scan (if not first scan)
     kt_double matchResponse = 0.0;
     if (m_pUseScanMatching->GetValue() && pLastScan != NULL) {
-      Pose2 bestPose;
-      matchResponse = m_pSequentialScanMatcher->MatchScan(pScan,
-        m_pMapperSensorManager->GetRunningScans(pScan->GetSensorName()),
-        bestPose,
-        cov);
-      pScan->SetSensorPose(bestPose);
+      if (m_pScanMatcherDebugLogging->GetValue()) {
+        const Pose2 tentativePose = pScan->GetSensorPose();
+        Pose2 bestPose;
+        matchResponse = m_pSequentialScanMatcher->MatchScan(pScan,
+          m_pMapperSensorManager->GetRunningScans(pScan->GetSensorName()),
+          bestPose, cov);
+        pScan->SetSensorPose(bestPose);
+        double dx  = bestPose.GetX()       - tentativePose.GetX();
+        double dy  = bestPose.GetY()       - tentativePose.GetY();
+        double dth = bestPose.GetHeading() - tentativePose.GetHeading();
+        std::cout << std::fixed << std::setprecision(4)
+                  << "[ScanMatcher] New Node Added | response=" << matchResponse
+                  << " | correction=(" << dx << ", " << dy << ", " << dth << ")"
+                  << std::endl;
+      } else {
+        Pose2 bestPose;
+        matchResponse = m_pSequentialScanMatcher->MatchScan(pScan,
+          m_pMapperSensorManager->GetRunningScans(pScan->GetSensorName()),
+          bestPose, cov);
+        pScan->SetSensorPose(bestPose);
+      }
       if (covariance) {
         *covariance = cov;
       }
@@ -2865,21 +2880,6 @@ kt_bool Mapper::Process(LocalizedRangeScan * pScan, Matrix3 * covariance)
 
     // add scan to buffer and assign id
     m_pMapperSensorManager->AddScan(pScan);
-
-    if (m_pScanMatcherDebugLogging->GetValue()) {
-      const Pose2 & odomPose = pScan->GetOdometricPose();
-      const Pose2 & smPose   = pScan->GetSensorPose();
-      std::cout << std::fixed << std::setprecision(6)
-                << "[ScanMatcher] New Node ADDED"
-                << ", response=" << matchResponse
-                << " | Odom Pose=("
-                << odomPose.GetX() << ", " << odomPose.GetY() << ", " << odomPose.GetHeading()
-                << ") | ScanMatcher Pose=("
-                << smPose.GetX() << ", " << smPose.GetY() << ", " << smPose.GetHeading()
-                << ") | var=(" << cov(0, 0) << ", " << cov(1, 1) << ")"
-                << std::endl;
-    }
-    // ─────────────────────────────────────────────────────────────────────────
 
     if (m_pUseScanMatching->GetValue()) {
       // add to graph
@@ -2939,12 +2939,22 @@ kt_bool Mapper::ProcessAgainstNodesNearBy(LocalizedRangeScan * pScan, kt_bool ad
     // correct scan (if not first scan)
     kt_double matchResponse = 0.0;
     if (m_pUseScanMatching->GetValue() && pLastScan != NULL) {
-      Pose2 bestPose;
-      matchResponse = m_pSequentialScanMatcher->MatchScan(pScan,
-        m_pMapperSensorManager->GetRunningScans(pScan->GetSensorName()),
-        bestPose,
-        cov);
-      pScan->SetSensorPose(bestPose);
+      if (m_pScanMatcherDebugLogging->GetValue()) {
+        Pose2 bestPose;
+        matchResponse = m_pSequentialScanMatcher->MatchScan(pScan,
+          m_pMapperSensorManager->GetRunningScans(pScan->GetSensorName()),
+          bestPose, cov);
+        pScan->SetSensorPose(bestPose);
+        std::cout << std::fixed << std::setprecision(4)
+                  << "[ScanMatcher][NearBy] New Node Added | response=" << matchResponse
+                  << std::endl;
+      } else {
+        Pose2 bestPose;
+        matchResponse = m_pSequentialScanMatcher->MatchScan(pScan,
+          m_pMapperSensorManager->GetRunningScans(pScan->GetSensorName()),
+          bestPose, cov);
+        pScan->SetSensorPose(bestPose);
+      }
     }
 
     pScan->SetOdometricPose(pScan->GetCorrectedPose());
@@ -2955,20 +2965,6 @@ kt_bool Mapper::ProcessAgainstNodesNearBy(LocalizedRangeScan * pScan, kt_bool ad
 
     // add scan to buffer and assign id
     m_pMapperSensorManager->AddScan(pScan);
-
-    if (m_pScanMatcherDebugLogging->GetValue()) {
-      const Pose2 & odomPose = pScan->GetOdometricPose();
-      const Pose2 & smPose   = pScan->GetSensorPose();
-      std::cout << std::fixed << std::setprecision(6)
-                << "[ScanMatcher][NearBy] New Node ADDED"
-                << ", response=" << matchResponse
-                << " | Odom Pose=("
-                << odomPose.GetX() << ", " << odomPose.GetY() << ", " << odomPose.GetHeading()
-                << ") | ScanMatcher Pose=("
-                << smPose.GetX() << ", " << smPose.GetY() << ", " << smPose.GetHeading()
-                << ") | var=(" << cov(0, 0) << ", " << cov(1, 1) << ")"
-                << std::endl;
-    }
 
     Vertex<LocalizedRangeScan> * scan_vertex = NULL;
     if (m_pUseScanMatching->GetValue()) {
@@ -3044,12 +3040,27 @@ kt_bool Mapper::ProcessLocalization(LocalizedRangeScan * pScan, Matrix3 * covari
   // correct scan (if not first scan)
   kt_double matchResponse = 0.0;
   if (m_pUseScanMatching->GetValue() && pLastScan != NULL) {
-    Pose2 bestPose;
-    matchResponse = m_pSequentialScanMatcher->MatchScan(pScan,
-      m_pMapperSensorManager->GetRunningScans(pScan->GetSensorName()),
-      bestPose,
-      cov);
-    pScan->SetSensorPose(bestPose);
+    if (m_pScanMatcherDebugLogging->GetValue()) {
+      const Pose2 tentativePose = pScan->GetSensorPose();
+      Pose2 bestPose;
+      matchResponse = m_pSequentialScanMatcher->MatchScan(pScan,
+        m_pMapperSensorManager->GetRunningScans(pScan->GetSensorName()),
+        bestPose, cov);
+      pScan->SetSensorPose(bestPose);
+      double dx  = bestPose.GetX()       - tentativePose.GetX();
+      double dy  = bestPose.GetY()       - tentativePose.GetY();
+      double dth = bestPose.GetHeading() - tentativePose.GetHeading();
+      std::cout << std::fixed << std::setprecision(4)
+                << "[ScanMatcher][Localization] New Node Added | response=" << matchResponse
+                << " | correction=(" << dx << ", " << dy << ", " << dth << ")"
+                << std::endl;
+    } else {
+      Pose2 bestPose;
+      matchResponse = m_pSequentialScanMatcher->MatchScan(pScan,
+        m_pMapperSensorManager->GetRunningScans(pScan->GetSensorName()),
+        bestPose, cov);
+      pScan->SetSensorPose(bestPose);
+    }
     if (covariance) {
       *covariance = cov;
     }
@@ -3057,20 +3068,6 @@ kt_bool Mapper::ProcessLocalization(LocalizedRangeScan * pScan, Matrix3 * covari
 
   // add scan to buffer and assign id
   m_pMapperSensorManager->AddScan(pScan);
-
-  if (m_pScanMatcherDebugLogging->GetValue()) {
-    const Pose2 & odomPose = pScan->GetOdometricPose();
-    const Pose2 & smPose   = pScan->GetSensorPose();
-    std::cout << std::fixed << std::setprecision(6)
-              << "[ScanMatcher][Localization] New Node ADDED"
-              << ", response=" << matchResponse
-              << " | Odom Pose=("
-              << odomPose.GetX() << ", " << odomPose.GetY() << ", " << odomPose.GetHeading()
-              << ") | ScanMatcher Pose=("
-              << smPose.GetX() << ", " << smPose.GetY() << ", " << smPose.GetHeading()
-              << ") | var=(" << cov(0, 0) << ", " << cov(1, 1) << ")"
-              << std::endl;
-  }
 
   Vertex<LocalizedRangeScan> * scan_vertex = NULL;
   if (m_pUseScanMatching->GetValue()) {
@@ -3242,12 +3239,22 @@ kt_bool Mapper::ProcessAgainstNode(
     // correct scan (if not first scan)
     kt_double matchResponse = 0.0;
     if (m_pUseScanMatching->GetValue() && pLastScan != NULL) {
-      Pose2 bestPose;
-      matchResponse = m_pSequentialScanMatcher->MatchScan(pScan,
-        m_pMapperSensorManager->GetRunningScans(pScan->GetSensorName()),
-        bestPose,
-        cov);
-      pScan->SetSensorPose(bestPose);
+      if (m_pScanMatcherDebugLogging->GetValue()) {
+        Pose2 bestPose;
+        matchResponse = m_pSequentialScanMatcher->MatchScan(pScan,
+          m_pMapperSensorManager->GetRunningScans(pScan->GetSensorName()),
+          bestPose, cov);
+        pScan->SetSensorPose(bestPose);
+        std::cout << std::fixed << std::setprecision(4)
+                  << "[ScanMatcher][AgainstNode] New Node Added | response=" << matchResponse
+                  << std::endl;
+      } else {
+        Pose2 bestPose;
+        matchResponse = m_pSequentialScanMatcher->MatchScan(pScan,
+          m_pMapperSensorManager->GetRunningScans(pScan->GetSensorName()),
+          bestPose, cov);
+        pScan->SetSensorPose(bestPose);
+      }
     }
 
     pScan->SetOdometricPose(pScan->GetCorrectedPose());
@@ -3257,20 +3264,6 @@ kt_bool Mapper::ProcessAgainstNode(
 
     // add scan to buffer and assign id
     m_pMapperSensorManager->AddScan(pScan);
-
-    if (m_pScanMatcherDebugLogging->GetValue()) {
-      const Pose2 & odomPose = pScan->GetOdometricPose();
-      const Pose2 & smPose   = pScan->GetSensorPose();
-      std::cout << std::fixed << std::setprecision(6)
-                << "[ScanMatcher][AgainstNode] New Node ADDED"
-                << ", response=" << matchResponse
-                << " | Odom Pose=("
-                << odomPose.GetX() << ", " << odomPose.GetY() << ", " << odomPose.GetHeading()
-                << ") | ScanMatcher Pose=("
-                << smPose.GetX() << ", " << smPose.GetY() << ", " << smPose.GetHeading()
-                << ") | var=(" << cov(0, 0) << ", " << cov(1, 1) << ")"
-                << std::endl;
-    }
 
     if (m_pUseScanMatching->GetValue()) {
       // add to graph
