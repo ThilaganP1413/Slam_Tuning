@@ -105,9 +105,9 @@ POSE_GRAPH.constraint_builder.loop_closure_rotation_weight = 1e5
 
 POSE_GRAPH.constraint_builder.log_matches = false
 
-POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher.linear_search_window = 7.
+POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher.linear_search_window = 15.
 POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher.angular_search_window = math.rad(30.)
-POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher.branch_and_bound_depth = 7
+POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher.branch_and_bound_depth = 9
 
 POSE_GRAPH.constraint_builder.ceres_scan_matcher.occupied_space_weight = 20.
 POSE_GRAPH.constraint_builder.ceres_scan_matcher.translation_weight = 10.

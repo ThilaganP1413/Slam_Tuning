@@ -1625,6 +1625,10 @@ kt_bool MapperGraph::TryCloseManualLoop(const int & id, const Eigen::Vector3d & 
   pScan->SetSensorPose(ManualPose);
   Name rSensorName = pScan->GetSensorName();
 
+  if (m_pMapper->m_pLoopClosureDebugLogging->GetValue()) {
+      std::cout << "[ManualLoopClosure] Scan ID: " << id << " is Moved from " << backupPose << " to " << ManualPose << std::endl;
+  }
+
   LocalizedRangeScanVector candidateChain = FindPossibleLoopClosure(pScan, rSensorName, scanIndex);
 
     if (m_pMapper->m_pLoopClosureDebugLogging->GetValue()) {
