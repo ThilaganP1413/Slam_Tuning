@@ -55,8 +55,8 @@ TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.translation_delta_cost_
 TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.rotation_delta_cost_weight = 1e-1
 
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.occupied_space_weight = 10.
-TRAJECTORY_BUILDER_2D.ceres_scan_matcher.translation_weight = 25.
-TRAJECTORY_BUILDER_2D.ceres_scan_matcher.rotation_weight = 40.
+TRAJECTORY_BUILDER_2D.ceres_scan_matcher.translation_weight = 50.
+TRAJECTORY_BUILDER_2D.ceres_scan_matcher.rotation_weight = 100.
 
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.ceres_solver_options.use_nonmonotonic_steps = false
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.ceres_solver_options.max_num_iterations = 20
@@ -96,7 +96,7 @@ TRAJECTORY_BUILDER_2D.submaps.range_data_inserter.probability_grid_range_data_in
 POSE_GRAPH.optimize_every_n_nodes = 50
 
 POSE_GRAPH.constraint_builder.sampling_ratio = 0.3
-POSE_GRAPH.constraint_builder.max_constraint_distance = 15.
+POSE_GRAPH.constraint_builder.max_constraint_distance = 30.
 POSE_GRAPH.constraint_builder.min_score = 0.55
 POSE_GRAPH.constraint_builder.global_localization_min_score = 0.6
 
@@ -105,7 +105,7 @@ POSE_GRAPH.constraint_builder.loop_closure_rotation_weight = 1e5
 
 POSE_GRAPH.constraint_builder.log_matches = false
 
-POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher.linear_search_window = 15.
+POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher.linear_search_window = 30.
 POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher.angular_search_window = math.rad(30.)
 POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher.branch_and_bound_depth = 9
 
@@ -127,7 +127,7 @@ POSE_GRAPH.optimization_problem.local_slam_pose_translation_weight = 1e5
 POSE_GRAPH.optimization_problem.local_slam_pose_rotation_weight = 1e5
 
 POSE_GRAPH.optimization_problem.odometry_translation_weight = 1e5
-POSE_GRAPH.optimization_problem.odometry_rotation_weight = 1e5
+POSE_GRAPH.optimization_problem.odometry_rotation_weight = 5e3
 
 POSE_GRAPH.optimization_problem.fixed_frame_pose_translation_weight = 1e1
 POSE_GRAPH.optimization_problem.fixed_frame_pose_rotation_weight = 1e2
