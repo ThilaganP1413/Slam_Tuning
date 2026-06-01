@@ -48,7 +48,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 "bag_filename",
-                default_value="/home/thilaks/ROS2/slam_ws/bag/patrol_lvl3_odom/patrol_lvl3_odom_0.db3",
+                default_value="/home/thilaks/ROS2/slam_ws/bag/IPR2/IPR2_raw_odom_patrol_edited.db3",
                 description="Full path to bag file (.db3)",
             ),
             # Cartographer offline node - processes bag directly
