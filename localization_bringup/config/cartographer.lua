@@ -48,15 +48,15 @@ TRAJECTORY_BUILDER_2D.num_accumulated_range_data = 1
 -- TRAJECTORY_BUILDER_2D.loop_closure_adaptive_voxel_filter.min_num_points = 100
 -- TRAJECTORY_BUILDER_2D.loop_closure_adaptive_voxel_filter.max_range = 50.
 
--- TRAJECTORY_BUILDER_2D.use_online_correlative_scan_matching = false
--- TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.linear_search_window = 0.1
--- TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.angular_search_window = math.rad(20.)
--- TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.translation_delta_cost_weight = 1e-1
--- TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.rotation_delta_cost_weight = 1e-1
+TRAJECTORY_BUILDER_2D.use_online_correlative_scan_matching = true
+TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.linear_search_window = 0.1
+TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.angular_search_window = math.rad(20.)
+TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.translation_delta_cost_weight = 1e-1
+TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.rotation_delta_cost_weight = 1e-1
 
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.occupied_space_weight = 10.
-TRAJECTORY_BUILDER_2D.ceres_scan_matcher.translation_weight = 10.
-TRAJECTORY_BUILDER_2D.ceres_scan_matcher.rotation_weight = 20.
+TRAJECTORY_BUILDER_2D.ceres_scan_matcher.translation_weight = 25.
+TRAJECTORY_BUILDER_2D.ceres_scan_matcher.rotation_weight = 40.
 
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.ceres_solver_options.use_nonmonotonic_steps = false
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.ceres_solver_options.max_num_iterations = 20
@@ -93,7 +93,7 @@ TRAJECTORY_BUILDER_2D.submaps.range_data_inserter.probability_grid_range_data_in
 TRAJECTORY_BUILDER_2D.submaps.range_data_inserter.probability_grid_range_data_inserter.hit_probability = 0.55
 TRAJECTORY_BUILDER_2D.submaps.range_data_inserter.probability_grid_range_data_inserter.miss_probability = 0.49
 
-POSE_GRAPH.optimize_every_n_nodes = 20
+POSE_GRAPH.optimize_every_n_nodes = 50
 
 POSE_GRAPH.constraint_builder.sampling_ratio = 0.3
 POSE_GRAPH.constraint_builder.max_constraint_distance = 15.
@@ -127,7 +127,7 @@ POSE_GRAPH.optimization_problem.local_slam_pose_translation_weight = 1e5
 POSE_GRAPH.optimization_problem.local_slam_pose_rotation_weight = 1e5
 
 POSE_GRAPH.optimization_problem.odometry_translation_weight = 1e5
-POSE_GRAPH.optimization_problem.odometry_rotation_weight = 1e4
+POSE_GRAPH.optimization_problem.odometry_rotation_weight = 1e5
 
 POSE_GRAPH.optimization_problem.fixed_frame_pose_translation_weight = 1e1
 POSE_GRAPH.optimization_problem.fixed_frame_pose_rotation_weight = 1e2
