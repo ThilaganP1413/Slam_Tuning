@@ -306,9 +306,6 @@ bool LoopClosureAssistant::manualLoopClosureCallback(
     }
   }
 
-  // optimize
-  mapper_->CorrectPoses();
-
   //update visualization and clear out nodes completed
   publishGraph();
   clearMovedNodes();

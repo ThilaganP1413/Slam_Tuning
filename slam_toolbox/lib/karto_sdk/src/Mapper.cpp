@@ -1617,10 +1617,6 @@ kt_bool MapperGraph::TryCloseManualLoop(const int & id, const Eigen::Vector3d & 
   pScan->SetSensorPose(ManualPose);
   Name rSensorName = pScan->GetSensorName();
 
-  if (m_pMapper->m_pDebugLogging->GetValue()) {
-      std::cout << "[ManualLoopClosure] Scan ID: " << id << " is Moved from " << backupPose << " to " << ManualPose << std::endl;
-  }
-
   LocalizedRangeScanVector candidateChain = FindPossibleLoopClosure(pScan, rSensorName, scanIndex);
 
   while (!candidateChain.empty()) {
@@ -1683,16 +1679,17 @@ kt_bool MapperGraph::TryCloseManualLoop(const int & id, const Eigen::Vector3d & 
                     << " | REJECTED at fine stage" << std::endl;
         }
       } else {
-        m_pMapper->FireBeginLoopClosure("Closing loop...");
+        m_pMapper->FireBeginLoopClosure("Closing Manual loop...");
 
         pScan->SetSensorPose(bestPose);
         LinkChainToScan(candidateChain, pScan, bestPose, covariance);
+        CorrectPoses();
 
         bestPoseOut(0) = bestPose.GetX();
         bestPoseOut(1) = bestPose.GetY();
         bestPoseOut(2) = bestPose.GetHeading();
 
-        m_pMapper->FireEndLoopClosure("Loop closed!");
+        m_pMapper->FireEndLoopClosure("Manual Loop closed!");
 
         loopClosed = true;
     
