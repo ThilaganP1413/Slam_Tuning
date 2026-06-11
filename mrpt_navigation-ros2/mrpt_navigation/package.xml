@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>mrpt_navigation</name>
+  <version>2.5.0</version>
+  <description>
+    Tools related to the Mobile Robot Programming Toolkit (MRPT).
+    Refer to https://wiki.ros.org/mrpt_navigation for further documentation.
+  </description>
+  <maintainer email="jlblanco@ual.es">Jose-Luis Blanco-Claraco</maintainer>
+  <maintainer email="markus.bader@tuwien.ac.at">Markus Bader</maintainer>
+  <author>Jose-Luis Blanco-Claraco</author>
+  <author>Markus Bader</author>
+  <license>BSD</license>
+  <url type="website">https://github.com/mrpt-ros-pkg/mrpt_navigation</url>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>mrpt_map_server</depend>
+  <depend>mrpt_msgs_bridge</depend>
+  <depend>mrpt_nav_interfaces</depend>
+  <depend>mrpt_pf_localization</depend>
+  <depend>mrpt_pointcloud_pipeline</depend>
+  <depend>mrpt_reactivenav2d</depend>
+  <depend>mrpt_tps_astar_planner</depend>
+  <depend>mrpt_tutorials</depend>
+
+  <depend>ament_cmake_lint_cmake</depend>
+  <depend>ament_cmake_xmllint</depend>
+  <depend>ament_lint_auto</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

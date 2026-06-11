@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>mrpt_tutorials</name>
+  <version>2.5.0</version>
+  <description>Example files used as tutorials for MRPT ROS packages</description>
+
+  <maintainer email="joseluisblancoc@gmail.com">Jose Luis Blanco-Claraco</maintainer>
+  <author>Markus Bader</author>
+  <author>Jose Luis Blanco-Claraco</author>
+
+  <license>BSD</license>
+  <url type="website">https://github.com/mrpt-ros-pkg/mrpt_navigation</url>
+
+  <buildtool_depend>cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <exec_depend>teleop_twist_keyboard</exec_depend>
+  <exec_depend>mvsim</exec_depend>
+
+  <depend>ament_cmake_lint_cmake</depend>
+  <depend>ament_cmake_xmllint</depend>
+  <depend>ament_lint_auto</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

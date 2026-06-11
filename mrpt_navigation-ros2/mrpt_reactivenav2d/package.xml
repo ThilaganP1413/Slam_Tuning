@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>mrpt_reactivenav2d</name>
+  <version>2.5.0</version>
+  <description>Reactive navigation for wheeled robots using MRPT navigation algorithms (TP-Space)</description>
+
+  <maintainer email="jlblanco@ual.es">Jose-Luis Blanco-Claraco</maintainer>
+  <maintainer email="shravansomashekara.rai@gmail.com">Shravan S Rai</maintainer>
+
+  <author email="jlblanco@ual.es">Jose-Luis Blanco-Claraco</author>
+
+  <license>BSD</license>
+  <url type="website">https://github.com/mrpt-ros-pkg/mrpt_navigation</url>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- DEPS -->
+  <depend>geometry_msgs</depend>
+  <depend>mrpt_libnav</depend>
+  <depend>mrpt_libros_bridge</depend>
+  <depend>mrpt_nav_interfaces</depend>
+  <depend>nav_msgs</depend>
+  <depend>rclcpp</depend>
+  <depend>rclcpp_components</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>stereo_msgs</depend>
+  <depend>tf2</depend>
+  <depend>tf2_geometry_msgs</depend>
+  <depend>tf2_ros</depend>
+  <depend>visualization_msgs</depend>
+
+  <depend>ament_cmake_lint_cmake</depend>
+  <depend>ament_cmake_xmllint</depend>
+  <depend>ament_lint_auto</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

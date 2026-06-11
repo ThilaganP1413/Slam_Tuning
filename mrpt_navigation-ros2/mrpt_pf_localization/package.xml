@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>mrpt_pf_localization</name>
+  <version>2.5.0</version>
+  <description>Package for robot 2D self-localization using dynamic or static (MRPT or ROS) maps.
+	The interface is similar to amcl (https://wiki.ros.org/amcl)
+   but supports different particle-filter algorithms, several grid maps at
+   different heights, range-only localization, etc.</description>
+
+  <maintainer email="markus.bader@tuwien.ac.at">Markus Bader</maintainer>
+  <maintainer email="joseluisblancoc@gmail.com">Jose Luis Blanco-Claraco</maintainer>
+  <author>Markus Bader</author>
+  <author email="raffi.z@gmail.com">Raphael Zack</author>
+
+  <license>BSD</license>
+  <url type="website">https://github.com/mrpt-ros-pkg/mrpt_navigation/tree/ros2/mrpt_pf_localization</url>
+
+  <!-- BUILD TOOLS -->
+  <buildtool_depend>cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- DEPS -->
+  <depend condition="$ROS_VERSION == 1">roscpp</depend>
+  <depend condition="$ROS_VERSION == 2">rclcpp</depend>
+  <depend>mola_relocalization</depend>
+  <depend>mp2p_icp</depend>
+  <depend>mrpt_libgui</depend>
+  <depend>mrpt_libros_bridge</depend>
+  <depend>mrpt_libslam</depend>
+  <depend>mrpt_msgs</depend>
+  <depend>mrpt_msgs_bridge</depend>
+  <depend>nav_msgs</depend>
+  <depend>pose_cov_ops</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>tf2</depend>
+  <depend>tf2_geometry_msgs</depend>
+  <depend>rclcpp</depend>
+  <depend>rclcpp_components</depend>
+
+  <depend>ament_cmake_lint_cmake</depend>
+  <depend>ament_cmake_xmllint</depend>
+  <depend>ament_lint_auto</depend>
+
+  <test_depend>mrpt_tutorials</test_depend>
+  <test_depend>ament_cmake_gtest</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
