@@ -1813,6 +1813,11 @@ void MapperGraph::LinkNearChains(
     if (response > m_pMapper->m_pLinkMatchMinimumResponseFine->GetValue() - KT_TOLERANCE) {
       rMeans.push_back(mean);
       rCovariances.push_back(covariance);
+      if (m_pMapper->m_pDebugLogging->GetValue()) {
+        std::cout << "Linking to near chain with response " << response
+                  << " > " << m_pMapper->m_pLinkMatchMinimumResponseFine->GetValue() - KT_TOLERANCE
+                  << std::endl;
+      }
       LinkChainToScan(*iter, pScan, mean, covariance);
     }
   }
