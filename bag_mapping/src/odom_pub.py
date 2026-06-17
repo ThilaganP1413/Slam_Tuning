@@ -8,7 +8,6 @@ from nav_msgs.msg import Odometry
 from geometry_msgs.msg import TransformStamped
 from tf2_ros import TransformBroadcaster, StaticTransformBroadcaster
 
-
 class OdomTFPublisher(Node):
 
     def __init__(self):
@@ -58,7 +57,6 @@ class OdomTFPublisher(Node):
         tf.transform.rotation      = msg.pose.pose.orientation
         self._tf_broadcaster.sendTransform(tf)
 
-
 def main(args=None):
     rclpy.init(args=args)
     node = OdomTFPublisher()
@@ -70,7 +68,6 @@ def main(args=None):
         node.destroy_node()
         if rclpy.ok():
             rclpy.shutdown()
-
 
 if __name__ == '__main__':
     main()

@@ -16,7 +16,7 @@ slam_toolbox:
 
     # if you'd like to start localizing on bringup in a map and pose
     map_file_name: /home/thilaks/ROS2/slam_ws/map/nyp_lvl3_map
-    map_start_pose: [-8.63, 100.46, -0.08]
+    map_start_pose: [6.11, -0.054, 3.065]
 
     debug_logging: true
     throttle_scans: 1

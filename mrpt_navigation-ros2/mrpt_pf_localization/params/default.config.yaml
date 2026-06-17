@@ -15,7 +15,7 @@
     use_se3_pf: false
 
     # Execution rate (in Hz) of the particle filter main loop:
-    rate_hz: 1.0
+    rate_hz: 0.5
 
     # Particle density (particles/m²) upon initialization:
     initial_particles_per_m2: 50
@@ -23,7 +23,7 @@
     # You can include the initial pose here as parameter, or send it via a topic or service.
     initial_pose:
       # Mean (center) of initial pose
-      mean: { x: -8.63, y: 100.46, z: 0.0, yaw: -0.08, pitch: 0.0, roll: 0.0 }
+      mean: { x: 6.11, y: -0.05, z: 0.0, yaw: 3.065, pitch: 0.0, roll: 0.0 }
       std_x: 1.0     # 1 sigma uncertainty [meters]
       std_y: 1.0
       std_z: 0.0
