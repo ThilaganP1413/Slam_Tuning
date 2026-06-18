@@ -2,8 +2,8 @@
 //
 // Monitors localization quality by scan-matching live LiDAR data against a
 // precomputed Euclidean distance-transform of a static 2D occupancy grid.
-// Publishes unified "Inlier Fraction", "RMSE", "Covariance Degradation", 
-// and "TF Jump" as a single std_msgs/String at the scan rate.
+// Publishes unified "Inlier Fraction", "RMSE", "Covariance Degradation",
+// "TF Jump", and an overall 0-100 quality score as a std_msgs/String.
 
 #include <rclcpp/rclcpp.hpp>
 
@@ -24,6 +24,7 @@
 
 #include <Eigen/Dense>
 
+#include <algorithm>   // for std::min, std::max
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
@@ -52,6 +53,11 @@ public:
     ema_alpha_ = this->declare_parameter<double>("ema_alpha", 0.1);
     ema_beta_ = this->declare_parameter<double>("ema_beta", 0.0005);
     tf_jump_window_ = this->declare_parameter<double>("tf_jump_window", 5.0);
+
+    // New thresholds for scoring
+    max_rmse_ = this->declare_parameter<double>("max_rmse", 0.5);
+    max_cov_degradation_ = this->declare_parameter<double>("max_cov_degradation", 5.0);
+    max_trans_jump_rate_ = this->declare_parameter<double>("max_trans_jump_rate", 1.0);
 
     ensureCapacity(max_scan_points_);
     transform_matrix_.setIdentity();
@@ -87,7 +93,7 @@ private:
   void mapCallback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg)
   {
     if (map_ready_) {
-      return; 
+      return;
     }
 
     map_width_ = static_cast<int>(msg->info.width);
@@ -128,14 +134,14 @@ private:
 
     // --- 1. Calculate Map -> Odom Jumps (N-Second Average Window) ---
     try {
-      geometry_msgs::msg::TransformStamped mo_tf_msg = 
+      geometry_msgs::msg::TransformStamped mo_tf_msg =
         tf_buffer_->lookupTransform(map_frame_, odom_frame_, tf2::TimePointZero);
-      
+
       const Eigen::Isometry3d mo_iso = tf2::transformToEigen(mo_tf_msg);
       const double curr_mo_yaw = std::atan2(mo_iso.rotation()(1, 0), mo_iso.rotation()(0, 0));
       const double curr_mo_x = mo_iso.translation().x();
       const double curr_mo_y = mo_iso.translation().y();
-      
+
       rclcpp::Time now = this->get_clock()->now();
 
       if (has_prev_map_odom_) {
@@ -150,7 +156,7 @@ private:
           double rot_jump = std::abs(dyaw);
 
           jump_history_.push_back({now, trans_jump, rot_jump});
-          
+
           prev_mo_x_ = curr_mo_x;
           prev_mo_y_ = curr_mo_y;
           prev_mo_yaw_ = curr_mo_yaw;
@@ -164,7 +170,7 @@ private:
 
       // Process the Sliding Window
       rclcpp::Time cutoff = now - rclcpp::Duration::from_seconds(tf_jump_window_);
-      
+
       // Pop old jump records that fall outside the time window
       while (!jump_history_.empty() && jump_history_.front().stamp < cutoff) {
         jump_history_.pop_front();
@@ -231,7 +237,7 @@ private:
     }
 
     if (valid_count == 0) {
-      return; 
+      return;
     }
 
     transformed_points_.leftCols(valid_count).noalias() =
@@ -241,7 +247,7 @@ private:
     const float origin_x = static_cast<float>(map_origin_x_);
     const float origin_y = static_cast<float>(map_origin_y_);
 
-    size_t rays_with_lookup = 0; 
+    size_t rays_with_lookup = 0;
     size_t inlier_count = 0;
     double sum_sq_dist = 0.0;
 
@@ -269,16 +275,64 @@ private:
       ? std::sqrt(sum_sq_dist / static_cast<double>(inlier_count))
       : 0.0;
 
-    // --- Publish Unified Message ---
-    char buf[256];
-    std::snprintf(buf, sizeof(buf), 
-      "Inlier Fraction: %.1f%% | RMSE: %.3fm | Cov Uncertainity: %.1f | TF Avg Jump: %.3fm/s, %.1fdeg/s", 
-      inlier_fraction * 100.0, 
-      rmse, 
+    // --- 3. Compute 0–100 scores for each metric ---
+    // Inlier Score (already percentage)
+    double inlier_score = inlier_fraction * 100.0;
+
+    // RMSE Score
+    double rmse_score = 0.0;
+    if (max_rmse_ > 0.0) {
+      rmse_score = 100.0 * (1.0 - (rmse / max_rmse_));
+    } else {
+      rmse_score = (rmse == 0.0) ? 100.0 : 0.0;
+    }
+    rmse_score = std::clamp(rmse_score, 0.0, 100.0);
+
+    // Covariance Score
+    double cov_score = 0.0;
+    if (max_cov_degradation_ > 1.0) {
+      cov_score = 100.0 * (1.0 - ((current_degradation_ratio_ - 1.0) / (max_cov_degradation_ - 1.0)));
+    } else if (max_cov_degradation_ == 1.0) {
+      cov_score = (current_degradation_ratio_ <= 1.0) ? 100.0 : 0.0;
+    } else {
+      cov_score = 100.0; // fallback
+    }
+    cov_score = std::clamp(cov_score, 0.0, 100.0);
+
+    // Jump Score (using translational jump rate)
+    double jump_score = 0.0;
+    if (max_trans_jump_rate_ > 0.0) {
+      jump_score = 100.0 * (1.0 - (current_trans_jump_rate_ / max_trans_jump_rate_));
+    } else {
+      jump_score = (current_trans_jump_rate_ == 0.0) ? 100.0 : 0.0;
+    }
+    jump_score = std::clamp(jump_score, 0.0, 100.0);
+
+    // --- 4. Weighted average (weights: Jump 20%, Inlier 35%, RMSE 30%, Cov 15%) ---
+    const double w_jump = 0.20;
+    const double w_inlier = 0.35;
+    const double w_rmse = 0.30;
+    const double w_cov = 0.15;
+    double base_weighted_score = w_jump * jump_score +
+                                 w_inlier * inlier_score +
+                                 w_rmse * rmse_score +
+                                 w_cov * cov_score;
+
+    // --- 5. Safety veto based on Jump Score ---
+    double veto_multiplier = std::min(1.0, jump_score / 50.0);
+    double final_quality_score = base_weighted_score * veto_multiplier;
+
+    // --- 6. Publish Unified Message ---
+    char buf[512];
+    std::snprintf(buf, sizeof(buf),
+      "Overall Quality: %.1f%% | Inlier Fraction: %.1f%% | RMSE: %.3fm | Cov Uncertainity: %.1f | TF Avg Jump: %.3fm/s, %.1fdeg/s",
+      final_quality_score,
+      inlier_fraction * 100.0,
+      rmse,
       current_degradation_ratio_,
       current_trans_jump_rate_,
       current_rot_jump_rate_ * 180.0 / M_PI);
-    
+
     std_msgs::msg::String quality_msg;
     quality_msg.data = buf;
     quality_pub_->publish(quality_msg);
@@ -368,14 +422,14 @@ private:
   rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr map_sub_;
   rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr scan_sub_;
   rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr pose_sub_;
-  
+
   // Unified Publisher
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr quality_pub_;
 
   std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
 
-  cv::Mat distance_transform_; 
+  cv::Mat distance_transform_;
   bool map_ready_{false};
   double map_resolution_{0.05};
   double map_origin_x_{0.0};
@@ -393,11 +447,16 @@ private:
   std::string odom_frame_{"odom"};
   double ema_alpha_{0.1};
   double ema_beta_{0.0005};
-  double tf_jump_window_{5.0}; // Configurable time window for the moving average
+  double tf_jump_window_{5.0};
+
+  // New scoring parameters
+  double max_rmse_{0.5};
+  double max_cov_degradation_{5.0};
+  double max_trans_jump_rate_{1.0};
 
   // State for Covariance
   double T_base_{-1.0};
-  double current_degradation_ratio_{1.0}; 
+  double current_degradation_ratio_{1.0};
 
   // State for TF Jumps (Moving Average)
   bool has_prev_map_odom_{false};
