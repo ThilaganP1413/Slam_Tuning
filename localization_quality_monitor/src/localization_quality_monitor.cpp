@@ -2,8 +2,8 @@
 //
 // Monitors localization quality by scan-matching live LiDAR data against a
 // precomputed Euclidean distance-transform of a static 2D occupancy grid.
-// Publishes unified "Inlier Fraction", "RMSE", and "Covariance Degradation" 
-// as a single std_msgs/String at the scan rate.
+// Publishes unified "Inlier Fraction", "RMSE", "Covariance Degradation", 
+// and "TF Jump" as a single std_msgs/String at the scan rate.
 
 #include <rclcpp/rclcpp.hpp>
 
@@ -47,6 +47,7 @@ public:
     map_topic_ = this->declare_parameter<std::string>("map_topic", "/map");
     scan_topic_ = this->declare_parameter<std::string>("scan_topic", "/scan");
     pose_topic_ = this->declare_parameter<std::string>("pose_topic", "/pose");
+    odom_frame_ = this->declare_parameter<std::string>("odom_frame", "odom");
     ema_alpha_ = this->declare_parameter<double>("ema_alpha", 0.1);
     ema_beta_ = this->declare_parameter<double>("ema_beta", 0.0005);
 
@@ -123,9 +124,62 @@ private:
       return;
     }
 
+    // --- 1. Calculate Map -> Odom Jumps ---
+    try {
+      geometry_msgs::msg::TransformStamped mo_tf_msg = 
+        tf_buffer_->lookupTransform(map_frame_, odom_frame_, tf2::TimePointZero);
+      
+      const Eigen::Isometry3d mo_iso = tf2::transformToEigen(mo_tf_msg);
+      const double curr_mo_yaw = std::atan2(mo_iso.rotation()(1, 0), mo_iso.rotation()(0, 0));
+      const double curr_mo_x = mo_iso.translation().x();
+      const double curr_mo_y = mo_iso.translation().y();
+      
+      rclcpp::Time now = this->get_clock()->now();
+
+      if (has_prev_map_odom_) {
+        double dx = curr_mo_x - prev_mo_x_;
+        double dy = curr_mo_y - prev_mo_y_;
+        double dyaw = curr_mo_yaw - prev_mo_yaw_;
+        dyaw = std::atan2(std::sin(dyaw), std::cos(dyaw));
+
+        // If transform physically moved
+        if (std::abs(dx) > 1e-6 || std::abs(dy) > 1e-6 || std::abs(dyaw) > 1e-6) {
+          double dt = (now - last_jump_time_).seconds();
+          if (dt > 0.001) {
+            double trans_jump = std::sqrt(dx * dx + dy * dy);
+            double rot_jump = std::abs(dyaw);
+
+            double trans_rate = trans_jump / dt;
+            double rot_rate = rot_jump / dt;
+
+            // Fast attack logic for peak hold
+            if (trans_rate > current_trans_jump_rate_) current_trans_jump_rate_ = trans_rate;
+            if (rot_rate > current_rot_jump_rate_) current_rot_jump_rate_ = rot_rate;
+          }
+          
+          prev_mo_x_ = curr_mo_x;
+          prev_mo_y_ = curr_mo_y;
+          prev_mo_yaw_ = curr_mo_yaw;
+          last_jump_time_ = now;
+        }
+      } else {
+        prev_mo_x_ = curr_mo_x;
+        prev_mo_y_ = curr_mo_y;
+        prev_mo_yaw_ = curr_mo_yaw;
+        last_jump_time_ = now;
+        has_prev_map_odom_ = true;
+      }
+    } catch (const tf2::TransformException & ex) {
+      // It's okay if odom isn't available yet
+    }
+
+    // Apply slow decay to jump rates so spikes slowly fade out making them readable
+    current_trans_jump_rate_ *= 0.95; 
+    current_rot_jump_rate_ *= 0.95;
+
+    // --- 2. Calculate Scan Matching ---
     geometry_msgs::msg::TransformStamped tf_msg;
     try {
-      // Using TimePointZero to avoid the 0.3ms extrapolation error lockup
       tf_msg = tf_buffer_->lookupTransform(map_frame_, msg->header.frame_id, tf2::TimePointZero);
     } catch (const tf2::TransformException & ex) {
       RCLCPP_WARN_THROTTLE(
@@ -207,9 +261,14 @@ private:
       : 0.0;
 
     // --- Publish Unified Message ---
-    char buf[128];
-    std::snprintf(buf, sizeof(buf), "Inlier: %.1f%% | RMSE: %.3fm | Cov Degradation: %.1fx", 
-                  inlier_fraction * 100.0, rmse, current_degradation_ratio_);
+    char buf[256];
+    std::snprintf(buf, sizeof(buf), 
+      "Inlier Fraction: %.1f%% | RMSE: %.3fm | Cov Uncertainity: %.1f | TF Jump: %.3fm/s, %.1fdeg/s", 
+      inlier_fraction * 100.0, 
+      rmse, 
+      current_degradation_ratio_,
+      current_trans_jump_rate_,
+      current_rot_jump_rate_ * 180.0 / M_PI);
     
     std_msgs::msg::String quality_msg;
     quality_msg.data = buf;
@@ -315,11 +374,22 @@ private:
   std::string map_topic_{"/map"};
   std::string scan_topic_{"/scan"};
   std::string pose_topic_{"/pose"};
+  std::string odom_frame_{"odom"};
   double ema_alpha_{0.1};
   double ema_beta_{0.0005};
 
+  // State for Covariance
   double T_base_{-1.0};
-  double current_degradation_ratio_{1.0}; // Holds the latest state from poseCallback
+  double current_degradation_ratio_{1.0}; 
+
+  // State for TF Jumps
+  bool has_prev_map_odom_{false};
+  double prev_mo_x_{0.0};
+  double prev_mo_y_{0.0};
+  double prev_mo_yaw_{0.0};
+  rclcpp::Time last_jump_time_{0, 0, RCL_ROS_TIME};
+  double current_trans_jump_rate_{0.0};
+  double current_rot_jump_rate_{0.0};
 
   std::vector<float> range_cos_cache_;
   std::vector<float> range_sin_cache_;
