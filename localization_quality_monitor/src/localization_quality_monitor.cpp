@@ -31,6 +31,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <deque>
 
 using std::placeholders::_1;
 
@@ -50,6 +51,7 @@ public:
     odom_frame_ = this->declare_parameter<std::string>("odom_frame", "odom");
     ema_alpha_ = this->declare_parameter<double>("ema_alpha", 0.1);
     ema_beta_ = this->declare_parameter<double>("ema_beta", 0.0005);
+    tf_jump_window_ = this->declare_parameter<double>("tf_jump_window", 5.0);
 
     ensureCapacity(max_scan_points_);
     transform_matrix_.setIdentity();
@@ -124,7 +126,7 @@ private:
       return;
     }
 
-    // --- 1. Calculate Map -> Odom Jumps ---
+    // --- 1. Calculate Map -> Odom Jumps (N-Second Average Window) ---
     try {
       geometry_msgs::msg::TransformStamped mo_tf_msg = 
         tf_buffer_->lookupTransform(map_frame_, odom_frame_, tf2::TimePointZero);
@@ -142,40 +144,47 @@ private:
         double dyaw = curr_mo_yaw - prev_mo_yaw_;
         dyaw = std::atan2(std::sin(dyaw), std::cos(dyaw));
 
-        // If transform physically moved
+        // If transform physically moved, record the jump
         if (std::abs(dx) > 1e-6 || std::abs(dy) > 1e-6 || std::abs(dyaw) > 1e-6) {
-          double dt = (now - last_jump_time_).seconds();
-          if (dt > 0.001) {
-            double trans_jump = std::sqrt(dx * dx + dy * dy);
-            double rot_jump = std::abs(dyaw);
+          double trans_jump = std::sqrt(dx * dx + dy * dy);
+          double rot_jump = std::abs(dyaw);
 
-            double trans_rate = trans_jump / dt;
-            double rot_rate = rot_jump / dt;
-
-            // Fast attack logic for peak hold
-            if (trans_rate > current_trans_jump_rate_) current_trans_jump_rate_ = trans_rate;
-            if (rot_rate > current_rot_jump_rate_) current_rot_jump_rate_ = rot_rate;
-          }
+          jump_history_.push_back({now, trans_jump, rot_jump});
           
           prev_mo_x_ = curr_mo_x;
           prev_mo_y_ = curr_mo_y;
           prev_mo_yaw_ = curr_mo_yaw;
-          last_jump_time_ = now;
         }
       } else {
         prev_mo_x_ = curr_mo_x;
         prev_mo_y_ = curr_mo_y;
         prev_mo_yaw_ = curr_mo_yaw;
-        last_jump_time_ = now;
         has_prev_map_odom_ = true;
       }
+
+      // Process the Sliding Window
+      rclcpp::Time cutoff = now - rclcpp::Duration::from_seconds(tf_jump_window_);
+      
+      // Pop old jump records that fall outside the time window
+      while (!jump_history_.empty() && jump_history_.front().stamp < cutoff) {
+        jump_history_.pop_front();
+      }
+
+      // Sum all remaining jumps in the window
+      double sum_trans = 0.0;
+      double sum_rot = 0.0;
+      for (const auto & record : jump_history_) {
+        sum_trans += record.trans_jump;
+        sum_rot += record.rot_jump;
+      }
+
+      // Calculate the average jump rate (meters/sec and rad/sec) over the N seconds
+      current_trans_jump_rate_ = sum_trans / tf_jump_window_;
+      current_rot_jump_rate_ = sum_rot / tf_jump_window_;
+
     } catch (const tf2::TransformException & ex) {
       // It's okay if odom isn't available yet
     }
-
-    // Apply slow decay to jump rates so spikes slowly fade out making them readable
-    current_trans_jump_rate_ *= 0.95; 
-    current_rot_jump_rate_ *= 0.95;
 
     // --- 2. Calculate Scan Matching ---
     geometry_msgs::msg::TransformStamped tf_msg;
@@ -263,7 +272,7 @@ private:
     // --- Publish Unified Message ---
     char buf[256];
     std::snprintf(buf, sizeof(buf), 
-      "Inlier Fraction: %.1f%% | RMSE: %.3fm | Cov Uncertainity: %.1f | TF Jump: %.3fm/s, %.1fdeg/s", 
+      "Inlier Fraction: %.1f%% | RMSE: %.3fm | Cov Uncertainity: %.1f | TF Avg Jump: %.3fm/s, %.1fdeg/s", 
       inlier_fraction * 100.0, 
       rmse, 
       current_degradation_ratio_,
@@ -349,6 +358,13 @@ private:
     return true;
   }
 
+  // Define a struct to hold historical jump data
+  struct JumpRecord {
+    rclcpp::Time stamp;
+    double trans_jump;
+    double rot_jump;
+  };
+
   rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr map_sub_;
   rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr scan_sub_;
   rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr pose_sub_;
@@ -377,17 +393,18 @@ private:
   std::string odom_frame_{"odom"};
   double ema_alpha_{0.1};
   double ema_beta_{0.0005};
+  double tf_jump_window_{5.0}; // Configurable time window for the moving average
 
   // State for Covariance
   double T_base_{-1.0};
   double current_degradation_ratio_{1.0}; 
 
-  // State for TF Jumps
+  // State for TF Jumps (Moving Average)
   bool has_prev_map_odom_{false};
   double prev_mo_x_{0.0};
   double prev_mo_y_{0.0};
   double prev_mo_yaw_{0.0};
-  rclcpp::Time last_jump_time_{0, 0, RCL_ROS_TIME};
+  std::deque<JumpRecord> jump_history_;
   double current_trans_jump_rate_{0.0};
   double current_rot_jump_rate_{0.0};
 

@@ -4,7 +4,7 @@
   <name>localization_quality_monitor</name>
   <version>1.0.0</version>
   <description>Localization Quality Monitoring Utility</description>
-  <maintainer email="you@example.com">your_name</maintainer>
+  <maintainer email="thilaganp1413@gmail.com">Thilagan P</maintainer>
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
