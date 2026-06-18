@@ -1,0 +1,5 @@
+float32 inlier_fraction
+float32 rmse
+float32 cov_degradation
+float32 tf_jump_xy
+float32 tf_jump_yaw

@@ -1,15 +1,9 @@
-// localization_quality_monitor.cpp
-//
-// Monitors localization quality by scan-matching live LiDAR data against a
-// precomputed Euclidean distance-transform of a static 2D occupancy grid.
-// Publishes unified "Inlier Fraction", "RMSE", "Covariance Degradation",
-// "TF Jump", and an overall 0-100 quality score as a std_msgs/String.
-
 #include <rclcpp/rclcpp.hpp>
 
 #include <nav_msgs/msg/occupancy_grid.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
-#include <std_msgs/msg/string.hpp>
+#include <localization_quality_monitor/msg/localization_score.hpp>
+#include <localization_quality_monitor/msg/localization_score_metrics.hpp>
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 
@@ -24,7 +18,7 @@
 
 #include <Eigen/Dense>
 
-#include <algorithm>   // for std::min, std::max
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
@@ -44,8 +38,7 @@ public:
   {
     inlier_threshold_ = this->declare_parameter<double>("inlier_threshold", 0.2);
     occupancy_threshold_ = this->declare_parameter<int>("occupancy_threshold", 50);
-    max_scan_points_ =
-      static_cast<size_t>(this->declare_parameter<int>("max_scan_points", 2400));
+    max_scan_points_ = static_cast<size_t>(this->declare_parameter<int>("max_scan_points", 2400));
     map_topic_ = this->declare_parameter<std::string>("map_topic", "/map");
     scan_topic_ = this->declare_parameter<std::string>("scan_topic", "/scan");
     pose_topic_ = this->declare_parameter<std::string>("pose_topic", "/pose");
@@ -53,8 +46,6 @@ public:
     ema_alpha_ = this->declare_parameter<double>("ema_alpha", 0.1);
     ema_beta_ = this->declare_parameter<double>("ema_beta", 0.0005);
     tf_jump_window_ = this->declare_parameter<double>("tf_jump_window", 5.0);
-
-    // New thresholds for scoring
     max_rmse_ = this->declare_parameter<double>("max_rmse", 0.5);
     max_cov_degradation_ = this->declare_parameter<double>("max_cov_degradation", 5.0);
     max_trans_jump_rate_ = this->declare_parameter<double>("max_trans_jump_rate", 1.0);
@@ -77,8 +68,8 @@ public:
       pose_topic_, rclcpp::QoS(10),
       std::bind(&LocalizationQualityMonitor::poseCallback, this, _1));
 
-    // Unified publisher
-    quality_pub_ = this->create_publisher<std_msgs::msg::String>("/localization_quality", 10);
+    quality_pub_ = this->create_publisher<localization_quality_monitor::msg::LocalizationScore>(
+      "/localization_quality", 10);
 
     tf_buffer_ = std::make_unique<tf2_ros::Buffer>(this->get_clock());
     tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
@@ -132,7 +123,6 @@ private:
       return;
     }
 
-    // --- 1. Calculate Map -> Odom Jumps (N-Second Average Window) ---
     try {
       geometry_msgs::msg::TransformStamped mo_tf_msg =
         tf_buffer_->lookupTransform(map_frame_, odom_frame_, tf2::TimePointZero);
@@ -150,7 +140,6 @@ private:
         double dyaw = curr_mo_yaw - prev_mo_yaw_;
         dyaw = std::atan2(std::sin(dyaw), std::cos(dyaw));
 
-        // If transform physically moved, record the jump
         if (std::abs(dx) > 1e-6 || std::abs(dy) > 1e-6 || std::abs(dyaw) > 1e-6) {
           double trans_jump = std::sqrt(dx * dx + dy * dy);
           double rot_jump = std::abs(dyaw);
@@ -168,15 +157,12 @@ private:
         has_prev_map_odom_ = true;
       }
 
-      // Process the Sliding Window
       rclcpp::Time cutoff = now - rclcpp::Duration::from_seconds(tf_jump_window_);
 
-      // Pop old jump records that fall outside the time window
       while (!jump_history_.empty() && jump_history_.front().stamp < cutoff) {
         jump_history_.pop_front();
       }
 
-      // Sum all remaining jumps in the window
       double sum_trans = 0.0;
       double sum_rot = 0.0;
       for (const auto & record : jump_history_) {
@@ -184,15 +170,13 @@ private:
         sum_rot += record.rot_jump;
       }
 
-      // Calculate the average jump rate (meters/sec and rad/sec) over the N seconds
       current_trans_jump_rate_ = sum_trans / tf_jump_window_;
-      current_rot_jump_rate_ = sum_rot / tf_jump_window_;
+      current_rot_jump_rate_ = (sum_rot / tf_jump_window_)* 180.0 / M_PI;
 
     } catch (const tf2::TransformException & ex) {
-      // It's okay if odom isn't available yet
+      // skip if odom isn't available yet
     }
 
-    // --- 2. Calculate Scan Matching ---
     geometry_msgs::msg::TransformStamped tf_msg;
     try {
       tf_msg = tf_buffer_->lookupTransform(map_frame_, msg->header.frame_id, tf2::TimePointZero);
@@ -275,8 +259,7 @@ private:
       ? std::sqrt(sum_sq_dist / static_cast<double>(inlier_count))
       : 0.0;
 
-    // --- 3. Compute 0–100 scores for each metric ---
-    // Inlier Score (already percentage)
+    // Inlier Score
     double inlier_score = inlier_fraction * 100.0;
 
     // RMSE Score
@@ -308,7 +291,7 @@ private:
     }
     jump_score = std::clamp(jump_score, 0.0, 100.0);
 
-    // --- 4. Weighted average (weights: Jump 20%, Inlier 35%, RMSE 30%, Cov 15%) ---
+    // Weighted average
     const double w_jump = 0.20;
     const double w_inlier = 0.35;
     const double w_rmse = 0.30;
@@ -318,24 +301,29 @@ private:
                                  w_rmse * rmse_score +
                                  w_cov * cov_score;
 
-    // --- 5. Safety veto based on Jump Score ---
+    // Safety veto based on Jump Score
     double veto_multiplier = std::min(1.0, jump_score / 50.0);
     double final_quality_score = base_weighted_score * veto_multiplier;
 
-    // --- 6. Publish Unified Message ---
-    char buf[512];
-    std::snprintf(buf, sizeof(buf),
-      "Overall Quality: %.1f%% | Inlier Fraction: %.1f%% | RMSE: %.3fm | Cov Uncertainity: %.1f | TF Avg Jump: %.3fm/s, %.1fdeg/s",
+    localization_quality_monitor::msg::LocalizationScore quality_msg;
+    quality_msg.localization_score = static_cast<int32_t>(final_quality_score);
+    quality_msg.metrics.inlier_fraction = static_cast<float>(inlier_fraction * 100.0);
+    quality_msg.metrics.rmse = static_cast<float>(rmse);
+    quality_msg.metrics.cov_degradation = static_cast<float>(current_degradation_ratio_);
+    quality_msg.metrics.tf_jump_xy = static_cast<float>(current_trans_jump_rate_);
+    quality_msg.metrics.tf_jump_yaw = static_cast<float>(current_rot_jump_rate_);
+
+    quality_pub_->publish(quality_msg);
+
+    RCLCPP_DEBUG_THROTTLE(
+      this->get_logger(), *this->get_clock(), 2000,
+      "Quality: %.1f%% | Inlier: %.1f%% | RMSE: %.3fm | Cov: %.1f | TF Jump: %.3fm/s, %.1fdeg/s",
       final_quality_score,
       inlier_fraction * 100.0,
       rmse,
       current_degradation_ratio_,
       current_trans_jump_rate_,
       current_rot_jump_rate_ * 180.0 / M_PI);
-
-    std_msgs::msg::String quality_msg;
-    quality_msg.data = buf;
-    quality_pub_->publish(quality_msg);
   }
 
   void poseCallback(const geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg)
@@ -412,7 +400,6 @@ private:
     return true;
   }
 
-  // Define a struct to hold historical jump data
   struct JumpRecord {
     rclcpp::Time stamp;
     double trans_jump;
@@ -423,8 +410,7 @@ private:
   rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr scan_sub_;
   rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr pose_sub_;
 
-  // Unified Publisher
-  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr quality_pub_;
+  rclcpp::Publisher<localization_quality_monitor::msg::LocalizationScore>::SharedPtr quality_pub_;
 
   std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
@@ -448,17 +434,11 @@ private:
   double ema_alpha_{0.1};
   double ema_beta_{0.0005};
   double tf_jump_window_{5.0};
-
-  // New scoring parameters
   double max_rmse_{0.5};
   double max_cov_degradation_{5.0};
   double max_trans_jump_rate_{1.0};
-
-  // State for Covariance
   double T_base_{-1.0};
   double current_degradation_ratio_{1.0};
-
-  // State for TF Jumps (Moving Average)
   bool has_prev_map_odom_{false};
   double prev_mo_x_{0.0};
   double prev_mo_y_{0.0};
